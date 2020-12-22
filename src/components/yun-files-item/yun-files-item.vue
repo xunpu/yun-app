@@ -1,7 +1,7 @@
 <template>
   <view class="wrap" @click="open">
     <image class="item-img" :src="realSrc" mode="aspectFill" />
-    <text class="item-text">{{ this.title }}</text>
+    <text class="item-text">{{ this.name }}</text>
     <tui-icon
       class="item-icon"
       name="circle"
@@ -13,14 +13,15 @@
 </template>
 
 <script>
+const TYPE_IMG = { 1: "folder", 2: "file" };
 export default {
   props: {
     type: {
       require: true,
-      default: "folder",
-      type: String,
+      default: 1,
+      type: Number,
     },
-    title: {
+    name: {
       require: true,
       default: "?",
       type: String,
@@ -28,15 +29,14 @@ export default {
     url: {
       default: "",
       type: String,
-    }
+    },
   },
   data() {
-    return {
-    };
+    return {};
   },
   computed: {
     realSrc() {
-      return `/static/${this.type}.png`;
+      return `/static/${TYPE_IMG[this.type]}.png`;
     },
   },
   methods: {
@@ -60,11 +60,15 @@ export default {
   height: 80rpx;
 }
 .item-text {
-  color: gray;
   margin-left: 1em;
-  width: calc(100% - 80rpx);
+  width: 90%;
+  color: gray;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .item-icon {
-  padding-right: 1em;
+  padding-left: 1em;
+  padding-right: 1.5em;
 }
 </style>

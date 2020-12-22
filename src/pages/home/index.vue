@@ -1,17 +1,13 @@
 <template>
   <view>
-    <view class="tui-input-border">
-      <u-input placeholder="搜索" />
-    </view>
     <yun-files-content></yun-files-content>
   </view>
 </template>
   
 <script>
 import storeCache from "@/store/list.js";
-import YunFilesContent from '../../components/yun-files-content/yun-files-content.vue';
+
 export default {
-  components: {YunFilesContent},
   data() {
     return {};
   },
@@ -23,6 +19,7 @@ export default {
       });
     },
     onPullDownRefresh() {
+      return;
       var that = this;
       request(api.product_banner).then((res) => {
         that.setData({
@@ -35,24 +32,11 @@ export default {
       });
     },
     onReachBottom: function () {
+      return;
       var that = this;
       that.listGoods();
     },
-    onPageScroll: function (t) {
-      if (t.scrollTop >= 180) {
-        wx.setNavigationBarColor({
-          frontColor: "#000000",
-          backgroundColor: "#ffffff",
-        });
-        app.fadeInOut(this, "fadeAni", 1);
-      } else {
-        wx.setNavigationBarColor({
-          frontColor: "#ffffff",
-          backgroundColor: "#ffffff",
-        });
-        app.fadeInOut(this, "fadeAni", 0);
-      }
-    },
+    onPageScroll: function (t) {},
     listGoods: function () {
       var that = this;
       manager.next(api.product).then((res) => {

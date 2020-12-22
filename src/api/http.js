@@ -10,14 +10,9 @@ const http = new Request();
 let tostTimeout;
 let app;
 
-/**
- * @description 修改全局默认配置
- * @param {Function}
- */
 http.setConfig(config => {
-  /* config 为默认全局配置 */
   Object.assign(config, {
-    baseUrl: `api/`,
+    baseUrl: `/api`,
     header: {
       'Content-Type': 'application/vnd.api+json',
       Accept: 'application/vnd.api+json',
@@ -33,19 +28,12 @@ http.setConfig(config => {
 http.validateStatus = statusCode => {
   return statusCode >= 200 && statusCode < 300;
 };
-/**
- * @param { Function} cancel - 取消请求,调用cancel 会取消本次请求，但是该函数的catch() 仍会执行; 不会进入响应拦截器
- *
- * @param {String} text ['handle cancel'| any] - catch((err) => {}) err.errMsg === 'handle cancel'。非必传，默认'handle cancel'
- * @cancel {Object} config - catch((err) => {}) err.config === config; 非必传，默认为request拦截器修改之前的config
- * function cancel(text, config) {}
- */
+
 http.interceptor.request(conf => {
   const config = conf;
-
   if (config.custom.loading) {
     uni.showLoading({
-      title: i18n.t('core.loading'),
+      title: '加载中',
       mask: true,
     });
   }
@@ -58,7 +46,6 @@ http.interceptor.request(conf => {
   app = getApp();
   // #endif
 
-  // cancel 为函数，如果调用会取消本次请求。需要注意：调用cancel,本次请求的catch仍会执行。必须return config
   try {
     const accessToken = app.$store.getters['session/get']('accessToken');
 
@@ -97,7 +84,6 @@ http.interceptor.response(
     app = getApp();
     // #endif
 
-    // 对响应错误做点什么 （statusCode !== 200），必须return response
     if (response && response.data && response.data.errors) {
       response.data.errors.forEach(error => {
         switch (error.code) {
@@ -122,7 +108,7 @@ http.interceptor.response(
           case 'site_closed':
             uni.showToast({
               icon: 'none',
-              title: i18n.t(`core.${error.code}`),
+              title: '错误',
             });
             break;
           case 'not_install':
@@ -135,11 +121,11 @@ http.interceptor.response(
               clearTimeout(tostTimeout);
               tostTimeout = setTimeout(() => {
                 // eslint-disable-next-line no-nested-ternary
-                const title = error.detail
-                  ? Array.isArray(error.detail)
-                    ? error.detail[0]
-                    : error.detail
-                  : i18n.t(`core.${error.code}`);
+                const title = error.detail ?
+                  Array.isArray(error.detail) ?
+                  error.detail[0] :
+                  error.detail :
+                  '错误代码:0';
                 uni.showToast({
                   icon: 'none',
                   title,
@@ -149,10 +135,14 @@ http.interceptor.response(
         }
       });
     } else if (response.config.custom.showTost) {
-      uni.showToast({ title: response.errMsg });
+      uni.showToast({
+        title: response.errMsg
+      });
     }
     return response;
   },
 );
 
-export { http };
+export {
+  http
+};

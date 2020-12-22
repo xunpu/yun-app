@@ -1,19 +1,48 @@
 <template>
-  <tui-list-view title="图片/2021-1-1/" color="#777" unlined="all">
-    <tui-list-cell unlined padding="10rpx 10rpx">
-      <yun-folder-item title="文件夹1" url="abc/123"></yun-folder-item>
-    </tui-list-cell>
-    <tui-list-cell unlined padding="10rpx 10rpx">
-      <yun-folder-item type="file" title="文件1"></yun-folder-item>
-    </tui-list-cell>
-  </tui-list-view>
+  <view>
+    <tui-list-view class="title" :title="path" color="#777" unlined="all">
+      <tui-list-cell
+        v-for="item in filelist"
+        :key="item.id"
+        unlined
+        padding="10rpx 10rpx"
+      >
+        <yun-files-item
+          :name="item.name"
+          :url="item.url"
+          :type="item.type"
+        ></yun-files-item>
+      </tui-list-cell>
+    </tui-list-view>
+  </view>
 </template>
 
 <script>
+import { getFiles } from "@/api/api";
 export default {
-  mounted() {},
+  data() {
+    return {
+      path: "",
+      filelist: [],
+    };
+  },
+  mounted() {
+    getFiles().then((res) => {
+      console.log(res.data);
+      this.path = res.data.path;
+      this.filelist = res.data.filelist;
+    });
+  },
 };
 </script>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
+.title/deep/ .tui-list-title {
+  width: 70%;
+  font-size: 36rpx;
+  letter-spacing: 2rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 </style>
