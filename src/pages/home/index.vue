@@ -1,6 +1,77 @@
 <template>
-  <view>
-    <yun-files-content></yun-files-content>
+  <view class="page">
+    <u-navbar
+      z-index="999"
+      height="60"
+      title=""
+      :back-text="filename"
+      :border-bottom="false"
+      :custom-back="myBack"
+    >
+    </u-navbar>
+    <yun-files-content v-on:change="getPath"></yun-files-content>
+    <tui-fab :right="50" :bottom="150" @click="showOpt"></tui-fab>
+    <u-popup
+      v-model="optShow"
+      mode="bottom"
+      z-index="99998"
+      border-radius="20"
+      duration="150"
+      closeable
+    >
+      <view class="opt-panel">
+        <u-row class="opt-content">
+          <u-col span="4">
+            <view class="wrap-inline" @click="newOpt('folder')">
+              <image
+                class="opt-img"
+                src="/static/wenjianjia.png"
+                mode="aspectFill"
+              />
+              <text>新文件夹</text>
+            </view>
+          </u-col>
+          <u-col span="4">
+            <view class="wrap-inline" @click="newOpt('image')">
+              <image
+                class="opt-img"
+                src="/static/tupian.png"
+                mode="aspectFill"
+              />
+              <text>上传图片</text>
+            </view>
+          </u-col>
+          <u-col span="4">
+            <view class="wrap-inline" @click="newOpt('other')">
+              <image
+                class="opt-img"
+                src="/static/weizhiwenjian.png"
+                mode="aspectFill"
+              />
+              <text>上传其它</text>
+            </view>
+          </u-col>
+        </u-row>
+      </view>
+    </u-popup>
+    <u-modal
+      v-model="newFolderPanelShow"
+      show-cancel-button
+      title=""
+      :zoom="false"
+      @cancel="optShow = true"
+    >
+      <view class="slot-content">
+        <u-form :model="newFolderForm" ref="uForm" label-position="top">
+          <u-form-item>
+            <text>{{this.filename}}</text>
+          </u-form-item>
+          <u-form-item label="创建新文件夹"
+            ><u-input v-model="newFolderForm.name"
+          /></u-form-item>
+        </u-form>
+      </view>
+    </u-modal>
   </view>
 </template>
   
@@ -9,10 +80,29 @@ import storeCache from "@/store/list.js";
 
 export default {
   data() {
-    return {};
+    return {
+      path: "",
+      filename: "",
+      optShow: false,
+      newFolderPanelShow: false,
+      newFolderForm: {},
+    };
   },
   onLoad() {},
   methods: {
+    myBack() {},
+    showOpt() {
+      this.optShow = true;
+    },
+    newOpt(type) {
+      if (type == "folder") {
+        this.optShow = false;
+        this.newFolderPanelShow = true;
+      }
+    },
+    getPath(value) {
+      this.filename = value;
+    },
     init() {
       storeCache.on(api.product).then((res) => {
         this.listGoods();
@@ -56,6 +146,30 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.slot-wrap {
+  display: flex;
+  align-items: center;
+}
+.page/deep/ .u-line-1 {
+  width: 45vw;
+  display: inline-block;
+}
+.opt-panel {
+  padding: 200rpx 0;
+  .opt-content {
+    text-align: center;
+    .opt-img {
+      margin-bottom: 20rpx;
+      width: 96rpx;
+      height: 96rpx;
+    }
+  }
+}
+.wrap-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 </style>
 
 

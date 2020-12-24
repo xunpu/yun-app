@@ -1,12 +1,15 @@
 <template>
   <view class="wrap" @click="open">
     <image class="item-img" :src="realSrc" mode="aspectFill" />
-    <text class="item-text">{{ this.name }}</text>
+    <view class="wrap-inline">
+      <text class="item-text">{{ this.name }}</text>
+      <text class="item-text mtime">{{ this.mtime }} {{ this.size }}</text>
+    </view>
     <tui-icon
       class="item-icon"
       name="circle"
       color="#CCC"
-      :size="12"
+      :size="21"
       unit="rpx"
     ></tui-icon>
   </view>
@@ -26,9 +29,21 @@ export default {
       default: "?",
       type: String,
     },
+    path: {
+      default: "",
+      type: String,
+    },
     url: {
       default: "",
       type: String,
+    },
+    mtime: {
+      default: "",
+      type: String,
+    },
+    size: {
+      default: "",
+      type: [String, Number],
     },
   },
   data() {
@@ -41,7 +56,7 @@ export default {
   },
   methods: {
     open(src) {
-      console.log(111, this.url);
+      this.$emit('current', this.name, this.path);
     },
   },
   mounted() {},
@@ -51,24 +66,33 @@ export default {
 <style lang="scss" scoped>
 .wrap {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  padding: 28rpx 14rpx;
+}
+.wrap-inline {
+  width: calc(100% - 146rpx);
+  display: flex;
+  flex-direction: column;
 }
 .item-img {
-  margin-left: 1em;
-  width: 80rpx;
-  height: 80rpx;
+  margin-left: 28rpx;
+  width: 56rpx;
+  height: 56rpx;
 }
 .item-text {
-  margin-left: 1em;
-  width: 90%;
-  color: gray;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  font-size: 28rpx;
+  margin-left: 42rpx;
+  color: $u-content-color;
+  // overflow: hidden;
+  // white-space: nowrap;
+  // text-overflow: ellipsis;
+  &.mtime {
+    color: $u-light-color;
+    font-size: 24rpx;
+  }
 }
 .item-icon {
-  padding-left: 1em;
-  padding-right: 1.5em;
+  padding-left: 21rpx;
 }
 </style>

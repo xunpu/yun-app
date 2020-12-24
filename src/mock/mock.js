@@ -9,5 +9,7 @@ Mock.mock('/api/files', 'post', {
         'ctime': '@datetime',
         'mtime': '@datetime',
         'url': '@url',
+        'path': '@url',
+        'size': '@integer(1,1000)KB'
     }]
 })
