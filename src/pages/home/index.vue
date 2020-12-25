@@ -57,19 +57,12 @@
     <u-modal
       v-model="newFolderPanelShow"
       show-cancel-button
-      title=""
+      title="创建新文件夹"
       :zoom="false"
       @cancel="optShow = true"
     >
-      <view class="slot-content">
-        <u-form :model="newFolderForm" ref="uForm" label-position="top">
-          <u-form-item>
-            <text>{{this.filename}}</text>
-          </u-form-item>
-          <u-form-item label="创建新文件夹"
-            ><u-input v-model="newFolderForm.name"
-          /></u-form-item>
-        </u-form>
+      <view class="new-folder-popup">
+        <u-input v-model="newFolderForm.name" />
       </view>
     </u-modal>
   </view>
@@ -98,6 +91,10 @@ export default {
       if (type == "folder") {
         this.optShow = false;
         this.newFolderPanelShow = true;
+      } else if (type == "image") {
+        uni.navigateTo({
+          url: "/pages/files/upload",
+        });
       }
     },
     getPath(value) {
@@ -146,10 +143,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.slot-wrap {
-  display: flex;
-  align-items: center;
-}
 .page/deep/ .u-line-1 {
   width: 45vw;
   display: inline-block;
@@ -164,6 +157,9 @@ export default {
       height: 96rpx;
     }
   }
+}
+.new-folder-popup {
+  padding: 0 75rpx;
 }
 .wrap-inline {
   display: flex;

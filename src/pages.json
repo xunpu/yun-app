@@ -4,9 +4,22 @@
 		"^tui-(.*)": "thorui-uni/lib/thorui/tui-$1/tui-$1.vue",
 		"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
 	},
-	"pages": [
-		{
+	"pages": [{
 			"path": "pages/home/index",
+			"style": {
+				"app-plus": {
+					"titleNView": false
+				}
+			}
+		},
+		{
+			"path": "pages/home/card",
+			"style": {
+				"navigationBarTitleText": "卡片列表"
+			}
+		},
+		{
+			"path": "pages/home/article",
 			"style": {
 				"app-plus": {
 					"titleNView": false
@@ -20,6 +33,12 @@
 					"titleNView": false
 				}
 			}
+		},
+		{
+			"path": "pages/files/upload",
+			"style": {
+				"navigationBarTitleText": "上传文件"
+			}
 		}
 	],
 	"tabBar": {
@@ -32,6 +51,18 @@
 				"text": "文件",
 				"iconPath": "static/folder-b-outline.png",
 				"selectedIconPath": "static/folder-b.png"
+			},
+			{
+				"pagePath": "pages/home/card",
+				"text": "卡片",
+				"iconPath": "static/account-box-outline.png",
+				"selectedIconPath": "static/account-box.png"
+			},
+			{
+				"pagePath": "pages/home/article",
+				"text": "信息",
+				"iconPath": "static/account-box-outline.png",
+				"selectedIconPath": "static/account-box.png"
 			},
 			{
 				"pagePath": "pages/my/index",
