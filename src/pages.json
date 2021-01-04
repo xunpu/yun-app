@@ -39,7 +39,14 @@
 			"style": {
 				"navigationBarTitleText": "上传文件"
 			}
+		},
+		{
+			"path": "pages/card/edit",
+			"style": {
+				"navigationBarTitleText": "卡片"
+			}
 		}
+
 	],
 	"tabBar": {
 		"color": "#7A7E83",

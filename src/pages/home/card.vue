@@ -1,7 +1,7 @@
 <template>
   <view class="page">
-    <yun-card-content v-on:change="getPath"></yun-card-content>
-    <tui-fab :right="50" :bottom="150" @click="showOpt"></tui-fab>
+    <yun-card-content v-on:change="getTitle"></yun-card-content>
+    <tui-fab :right="50" :bottom="150" @click="showOpt" bgColor="#56b1fc"></tui-fab>
     </view>
 </template>
   
@@ -12,8 +12,7 @@ export default {
   data() {
     return {
       path: "",
-      filename: "",
-      optShow: false,
+      cardname: "",
       newFolderPanelShow: false,
       newFolderForm: {},
     };
@@ -22,11 +21,13 @@ export default {
   methods: {
     myBack() {},
     showOpt() {
-      this.optShow = true;
+      uni.navigateTo({
+        url: '/pages/card/edit'
+      })
     },
     newOpt(type) {
       if (type == "folder") {
-        this.optShow = false;
+
         this.newFolderPanelShow = true;
       } else if (type == "image") {
         uni.navigateTo({
@@ -34,8 +35,8 @@ export default {
         });
       }
     },
-    getPath(value) {
-      this.filename = value;
+    getTitle(value) {
+      this.cardname = value;
     },
     init() {
       storeCache.on(api.product).then((res) => {
@@ -80,10 +81,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.page/deep/ .u-line-1 {
-  width: 45vw;
-  display: inline-block;
-}
 .opt-panel {
   padding: 200rpx 0;
   .opt-content {

@@ -2,7 +2,7 @@
   <view>
     <tui-list-view unlined="all">
       <tui-list-cell
-        v-for="item in filelist"
+        v-for="item in cardlist"
         :key="item.id"
         unlined
         padding="0 0"
@@ -15,12 +15,12 @@
 </template>
 
 <script>
-import { getFiles } from "@/api/api";
+import { getCards } from "@/api/api";
 export default {
   data() {
     return {
       curPath: "",
-      filelist: [],
+      cardlist: [],
     };
   },
   methods: {
@@ -29,10 +29,10 @@ export default {
     },
   },
   mounted() {
-    getFiles().then((res) => {
+    getCards().then((res) => {
       console.log(res.data);
       this.path = res.data.path;
-      this.filelist = res.data.filelist;
+      this.cardlist = res.data.cardlist;
     });
   },
 };
