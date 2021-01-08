@@ -1,45 +1,56 @@
 <template>
   <view>
     <tui-list-view unlined="all">
-      <tui-list-cell
-        v-for="item in cardlist"
-        :key="item.id"
-        unlined
-        padding="0 0"
-        backgroundColor="transparent"
-      >
-        <yun-card-item @current="getPath" v-bind="item"></yun-card-item>
-      </tui-list-cell>
+      <view v-for="(page, index) in cardlist" :key="index">
+        <tui-list-cell
+          v-for="item in page"
+          :key="item.id"
+          unlined
+          padding="0 0"
+          backgroundColor="transparent"
+        >
+          <yun-card-item @detail="detail" :card="item"></yun-card-item>
+        </tui-list-cell>
+      </view>
     </tui-list-view>
+    <u-modal
+      v-model="cardModal"
+      title="跳转到链接"
+      :show-cancel-button="true"
+      :content="link"
+      @confirm="goto"
+    ></u-modal>
   </view>
 </template>
 
 <script>
 import { getCards } from "@/api/api";
 export default {
+  props: {
+    cardlist: {
+      require: true,
+    },
+  },
   data() {
     return {
+      link: "",
+      cardModal: false,
       curPath: "",
-      cardlist: [],
     };
   },
   methods: {
-    getPath(name, path) {
-      this.$emit("change", name);
+    goto() {},
+    detail(params) {
+      this.link = params.link;
+      this.cardModal = true;
     },
   },
-  mounted() {
-    getCards().then((res) => {
-      console.log(res.data);
-      this.path = res.data.path;
-      this.cardlist = res.data.cardlist;
-    });
-  },
+  mounted() {},
 };
 </script>
 
 <style lang="scss" scoped>
 uni-page-body {
-  background-color: #EEE;
+  background-color: #eee;
 }
 </style>

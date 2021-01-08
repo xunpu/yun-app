@@ -1,17 +1,29 @@
 <template>
-  <view class="wrap" @click="open">
+  <view
+    class="wrap"
+    @click="open"
+    @touchstart="showOpt"
+    @touchend="clearShowOpt"
+  >
     <image class="item-img" :src="realSrc" mode="aspectFill" />
     <view class="wrap-inline">
-      <text class="item-text">{{ this.name }}</text>
-      <text class="item-text mtime">{{ this.mtime }} {{ this.size }}</text>
+      <text class="item-text">{{ file.name }}</text>
+      <text class="item-text mtime">{{ file.mtime }} {{ file.size }}</text>
     </view>
-    <tui-icon
+    <!-- <tui-icon
       class="item-icon"
       name="circle"
       color="#CCC"
       :size="21"
       unit="rpx"
-    ></tui-icon>
+    ></tui-icon> -->
+    <u-icon
+      v-if="showCheck"
+      :name="checkState ? 'checkmark-circle-fill' : 'minus-circle'"
+      class="item-icon"
+      color="#8097bd"
+      size="36"
+    ></u-icon>
   </view>
 </template>
 
@@ -19,44 +31,43 @@
 const TYPE_IMG = { 1: "folder", 2: "file" };
 export default {
   props: {
-    type: {
+    showCheck: {
+      type: Boolean,
+      default: false,
+    },
+    file: {
       require: true,
-      default: 1,
-      type: Number,
-    },
-    name: {
-      require: true,
-      default: "?",
-      type: String,
-    },
-    path: {
-      default: "",
-      type: String,
-    },
-    url: {
-      default: "",
-      type: String,
-    },
-    mtime: {
-      default: "",
-      type: String,
-    },
-    size: {
-      default: "",
-      type: [String, Number],
     },
   },
   data() {
-    return {};
+    return {
+      checkState: false,
+      longTap: null,
+    };
   },
   computed: {
     realSrc() {
-      return `/static/${TYPE_IMG[this.type]}.png`;
+      return `/static/${TYPE_IMG[this.file.type]}.png`;
     },
   },
   methods: {
+    showOpt() {
+      let that = this;
+      this.longTap = setTimeout(function () {
+        that.$emit("event-bridge", { type: "show-icon" });
+        that.checkState = true;
+        that.$emit("take-file", that.file);
+      }, 1000);
+    },
+    clearShowOpt() {
+      clearTimeout(this.longTap);
+    },
     open(src) {
-      this.$emit('current', this.name, this.path);
+      if (this.showCheck === true) {
+        this.checkState ? (this.checkState = false) : (this.checkState = true);
+      } else {
+        this.$emit("take-file", this.file);
+      }
     },
   },
   mounted() {},
@@ -71,7 +82,7 @@ export default {
   padding: 28rpx 14rpx;
 }
 .wrap-inline {
-  width: calc(100% - 146rpx);
+  width: calc(100% - 156rpx);
   display: flex;
   flex-direction: column;
 }

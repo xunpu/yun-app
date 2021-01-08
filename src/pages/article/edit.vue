@@ -14,7 +14,12 @@
           mode="aspectFill"
           :src="form.image"
         ></image>
-        <u-button class="image-btn" @click="chooseImage" :hair-line="false">更改</u-button>
+        <u-button class="image-btn" @click="chooseImage" :hair-line="false"
+          >更改</u-button
+        >
+      </u-form-item>
+      <u-form-item>
+        <rich-text :nodes="richText"></rich-text>
       </u-form-item>
     </u-form>
     <u-button class="submit" @click="submit" type="primary">提交</u-button>
@@ -29,6 +34,8 @@ export default {
       action: "",
       fileList: [],
       form: {},
+      richText:
+        '<div style="text-align:center;">asdf<img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/d8590190-4f28-11eb-b680-7980c8a877b8.png"/></div>',
     };
   },
   methods: {

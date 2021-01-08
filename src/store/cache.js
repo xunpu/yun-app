@@ -1,4 +1,9 @@
-import http from '@/api/http';
+import {
+  http
+} from "@/api/http";
+import {
+  getCurrentPage
+} from '@/utils/router';
 
 var Cache = (function () {
 
@@ -24,12 +29,13 @@ var Cache = (function () {
         try {
           let res = await http.post(url, params);
           params = {};
-          if (res.results.length === 0) {
+          if (res.data.length === 0) {
             break
           }
-          obj.data.push(res);
-          obj.next = res.next;
-          if (res.next == null) {
+          let data = res.data;
+          obj.data.push(data);
+          obj.next = data.next;
+          if (obj.next == null) {
             obj.pedding = '';
           }
           url = obj.next;
@@ -41,9 +47,7 @@ var Cache = (function () {
   }
 
   Cache.prototype.on = function (api, params = {}, preload = 2) {
-    var pages = getCurrentPages();
-    var page = pages[pages.length - 1];
-    var path = page.route;
+    var path = getCurrentPage();
     if (this._data[path] === undefined) {
       this._data[path] = {};
     }
@@ -63,14 +67,13 @@ var Cache = (function () {
   }
 
   Cache.prototype.next = function (api, fetch_only = false) {
-    var pages = getCurrentPages();
-    var page = pages[pages.length - 1];
-    var obj = this._data[page.route][api];
+    var path = getCurrentPage();
+    var obj = this._data[path][api];
     if (obj.data.length >= 2) {
       fetch(api, obj);
     } else {
       fetch(api, obj, 2);
-    }
+    }   
     if (obj.data.length == 0 && obj.next == null) {
       return Promise.resolve(false);
     } else if (fetch_only === true) {
@@ -85,20 +88,19 @@ var Cache = (function () {
   }
 
   Cache.prototype.delete = function (api) {
-    var pages = getCurrentPages();
-    var path = pages[pages.length - 1].route;
+    var path = getCurrentPage();
+    this._data[path][api]
     if (this._data[path] === undefined) {
-      return Promise.resolve();
-    } else if (api === undefined && path in this._data) {
-      this._data[path] = undefined;
-    } else {
+      return Promise.resolve(false);
+    } else if (path in this._data) {
       this._data[path][api] = undefined;
+    } else {
+      return Promise.resolve(false);
     }
-    return Promise.resolve();
+    return Promise.resolve(true);
   }
-
+  
   return Cache;
-
 }());
 
 function createInstance() {

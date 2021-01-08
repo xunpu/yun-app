@@ -1,15 +1,35 @@
 <template>
   <view class="page">
     <u-navbar
-      z-index="999"
+      z-index="900"
       height="60"
       title=""
+      :is-back="isBack"
       :back-text="filename"
       :border-bottom="false"
-      :custom-back="myBack"
+      :custom-back="backEvent"
     >
+      <view v-if="isShowRight" slot="right">
+        <u-button
+          @click="closeFileOpt"
+          class="file-btn close-btn"
+          :hair-line="false"
+          >关闭</u-button
+        >
+        <u-button class="file-btn" :hair-line="false">移动</u-button>
+        <u-button class="file-btn" :hair-line="false">改名</u-button>
+        <u-button class="file-btn" :hair-line="false">删除</u-button>
+        <u-button @click="selectAll" class="file-btn" :hair-line="false">{{
+          multiSelectState ? "全选" : "全不选"
+        }}</u-button>
+      </view>
     </u-navbar>
-    <yun-files-content v-on:change="getPath"></yun-files-content>
+    <yun-files-content
+      ref="myfile"
+      @multi-select="multiSelect"
+      @take-file="changeBackText"
+      :filelist="filelist"
+    ></yun-files-content>
     <tui-fab :right="50" :bottom="150" @click="showOpt"></tui-fab>
     <u-popup
       v-model="optShow"
@@ -69,21 +89,43 @@
 </template>
   
 <script>
-import storeCache from "@/store/list.js";
-
+import storeCache from "@/store/cache.js";
+import { FILE_LIST } from "@/api/api";
 export default {
   data() {
     return {
+      multiSelectState: true,
+      isBack: true,
+      isShowRight: false,
       path: "",
       filename: "",
       optShow: false,
       newFolderPanelShow: false,
       newFolderForm: {},
+      filelist: [],
     };
   },
-  onLoad() {},
+  onReady() {
+    this.initList();
+  },
   methods: {
-    myBack() {},
+    multiSelect() {
+      this.isShowRight = true;
+      this.isBack = false;
+    },
+    selectAll() {
+      this.multiSelectState
+        ? ((this.multiSelectState = false), this.$refs.myfile.selectAll())
+        : ((this.multiSelectState = true), this.$refs.myfile.unSelectAll());
+    },
+    closeFileOpt() {
+      this.$refs.myfile.unSelectAll();
+      this.multiSelectState = true;
+      this.isShowRight = false;
+      this.isBack = true;
+      this.$refs.myfile.disableSelect();
+    },
+    backEvent() {},
     showOpt() {
       this.optShow = true;
     },
@@ -97,55 +139,40 @@ export default {
         });
       }
     },
-    getPath(value) {
-      this.filename = value;
+    changeBackText(file) {
+      this.filename = file.name;
     },
-    init() {
-      storeCache.on(api.product).then((res) => {
-        this.listGoods();
+    initList() {
+      storeCache.on(FILE_LIST).then((res) => {
+        storeCache.next(FILE_LIST).then((res) => {
+          this.filelist.push(res.data.filelist);
+          uni.stopPullDownRefresh();
+        });
       });
     },
     onPullDownRefresh() {
-      return;
-      var that = this;
-      request(api.product_banner).then((res) => {
-        that.setData({
-          banners: res,
-        });
-      });
-      manager.delete(api.product);
-      manager.on(api.product).then((res) => {
-        that.listGoods();
-      });
+      storeCache.delete(FILE_LIST);
+      this.filelist = [];
+      this.initList();
     },
     onReachBottom: function () {
-      return;
-      var that = this;
-      that.listGoods();
-    },
-    onPageScroll: function (t) {},
-    listGoods: function () {
-      var that = this;
-      manager.next(api.product).then((res) => {
-        var index = res.index;
-        res.data.results.forEach((v) => {
-          var price = that.getPrice(v);
-          v.minPrice = price.minPrice;
-          v.maxPrice = price.maxPrice;
-        });
-        that.setData({
-          ["goods[" + index + "]"]: res.data.results,
-          nextPageUrl: res.data.next,
-        });
+      storeCache.next(FILE_LIST).then((res) => {
+        this.filelist.push(res.data.filelist);
       });
     },
   },
 };
 </script>
 <style lang="scss" scoped>
-.page/deep/ .u-line-1 {
-  width: 45vw;
-  display: inline-block;
+.page/deep/ {
+  .u-line-1 {
+    width: 45vw;
+    display: inline-block;
+  }
+  .file-btn {
+    width: 150rpx;
+    border-width: 0;
+  }
 }
 .opt-panel {
   padding: 200rpx 0;
@@ -165,6 +192,9 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.close-btn {
+  color: #fa2800;
 }
 </style>
 

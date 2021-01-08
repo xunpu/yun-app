@@ -9,21 +9,22 @@
 			"style": {
 				"app-plus": {
 					"titleNView": false
-				}
+				},
+				"enablePullDownRefresh": true
 			}
 		},
 		{
 			"path": "pages/home/card",
 			"style": {
-				"navigationBarTitleText": "卡片列表"
+				"navigationBarTitleText": "卡片列表",
+				"enablePullDownRefresh": true
 			}
 		},
 		{
 			"path": "pages/home/article",
 			"style": {
-				"app-plus": {
-					"titleNView": false
-				}
+				"navigationBarTitleText": "文章列表",
+				"enablePullDownRefresh": true
 			}
 		},
 		{
@@ -41,12 +42,24 @@
 			}
 		},
 		{
+			"path": "pages/files/image-view",
+			"style": {
+				"navigationBarTitleText": "浏览图片",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
 			"path": "pages/card/edit",
 			"style": {
 				"navigationBarTitleText": "卡片"
 			}
+		},
+		{
+			"path": "pages/article/edit",
+			"style": {
+				"navigationBarTitleText": "文章"
+			}
 		}
-
 	],
 	"tabBar": {
 		"color": "#7A7E83",
@@ -67,7 +80,7 @@
 			},
 			{
 				"pagePath": "pages/home/article",
-				"text": "信息",
+				"text": "文章",
 				"iconPath": "static/account-box-outline.png",
 				"selectedIconPath": "static/account-box.png"
 			},

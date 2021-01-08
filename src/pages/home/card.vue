@@ -1,80 +1,53 @@
 <template>
   <view class="page">
-    <yun-card-content v-on:change="getTitle"></yun-card-content>
-    <tui-fab :right="50" :bottom="150" @click="showOpt" bgColor="#56b1fc"></tui-fab>
-    </view>
+    <yun-card-content :cardlist="cardlist"></yun-card-content>
+    <tui-fab
+      :right="50"
+      :bottom="150"
+      @click="navToEditor"
+      bgColor="#56b1fc"
+    ></tui-fab>
+  </view>
 </template>
   
 <script>
-import storeCache from "@/store/list.js";
+import storeCache from "@/store/cache.js";
+import { CARD_LIST } from "@/api/api";
 
 export default {
   data() {
     return {
       path: "",
-      cardname: "",
+      cardlist: [],
       newFolderPanelShow: false,
       newFolderForm: {},
     };
   },
-  onLoad() {},
+  onReady() {
+    this.initList();
+  },
   methods: {
-    myBack() {},
-    showOpt() {
+    navToEditor() {
       uni.navigateTo({
-        url: '/pages/card/edit'
-      })
+        url: "/pages/card/edit",
+      });
     },
-    newOpt(type) {
-      if (type == "folder") {
-
-        this.newFolderPanelShow = true;
-      } else if (type == "image") {
-        uni.navigateTo({
-          url: "/pages/files/upload",
+    initList() {
+      storeCache.on(CARD_LIST).then((res) => {
+        storeCache.next(CARD_LIST).then((res) => {
+          this.cardlist.push(res.data.cardlist);
+          uni.stopPullDownRefresh();
         });
-      }
-    },
-    getTitle(value) {
-      this.cardname = value;
-    },
-    init() {
-      storeCache.on(api.product).then((res) => {
-        this.listGoods();
       });
     },
     onPullDownRefresh() {
-      return;
-      var that = this;
-      request(api.product_banner).then((res) => {
-        that.setData({
-          banners: res,
-        });
-      });
-      manager.delete(api.product);
-      manager.on(api.product).then((res) => {
-        that.listGoods();
-      });
+      storeCache.delete(CARD_LIST);
+      this.cardlist = [];
+      this.initList();
     },
     onReachBottom: function () {
-      return;
-      var that = this;
-      that.listGoods();
-    },
-    onPageScroll: function (t) {},
-    listGoods: function () {
-      var that = this;
-      manager.next(api.product).then((res) => {
-        var index = res.index;
-        res.data.results.forEach((v) => {
-          var price = that.getPrice(v);
-          v.minPrice = price.minPrice;
-          v.maxPrice = price.maxPrice;
-        });
-        that.setData({
-          ["goods[" + index + "]"]: res.data.results,
-          nextPageUrl: res.data.next,
-        });
+      storeCache.next(CARD_LIST).then((res) => {
+        this.cardlist.push(res.data.cardlist);
       });
     },
   },

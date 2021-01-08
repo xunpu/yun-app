@@ -1,22 +1,27 @@
 <template>
-  <view class="wrap" @click="open">
+  <view class="wrap">
     <u-card
-      :title="title"
-      :thumb="thumb"
-      :sub-title="ctime"
+      :title="card.title"
+      :thumb="card.thumb"
+      :sub-title="card.ctime"
       thumb-width="42"
       thumb-height="42"
       thumb-circle
+      margin="30rpx 40rpx 0 40rpx"
+      @head-click="open"
+      @body-click="open"
+      @foot-click="edit"
     >
       <view slot="body" class="body">
-        <image class="body-image" :src="image" mode="aspectFill"></image>
+        <image class="body-image" :src="card.image" mode="aspectFill"></image>
         <view class="body-text">
-          <text v-html="text"></text>
+          <text class="real-text" v-html="card.text"></text>
         </view>
       </view>
-      <view class="" slot="foot"
-        ><u-icon name="chat-fill" size="28" color="" label="阅读原文"></u-icon
-      ></view>
+      <view slot="foot" class="card-foot">
+        <!-- <u-icon name="chat" size="28" color="" label="阅读原文"></u-icon> -->
+        <u-icon name="setting" size="28" margin-left="12" label="编辑"></u-icon>
+      </view>
     </u-card>
   </view>
 </template>
@@ -24,47 +29,28 @@
 <script>
 export default {
   props: {
-    id: {
+    card: {
       require: true,
-      type: [Number, String],
-    },
-    title: {
-      require: true,
-      default: "",
-      type: String,
-    },
-    text: {
-      require: true,
-      default: "",
-      type: String,
-    },
-    thumb: {
-      require: true,
-    },
-    image: {
-      require: true,
-    },
-    url: {
-      default: "",
-      type: String,
-    },
-    ctime: {
-      default: "",
-      type: String,
     },
   },
   data() {
-    return {
-      cardlist: [],
-    };
+    return {};
   },
   computed: {},
   methods: {
-    open(src) {
-      this.$emit("current", this.id);
+    open() {
+      this.$emit("detail", { link: this.card.link });
+    },
+    edit() {
+      let that = this;
+      uni.navigateTo({
+        url: "/pages/card/edit?id=123123",
+        success: function (res) {
+          res.eventChannel.emit("acceptCardData", { card: that.card });
+        },
+      });
     },
   },
-  mounted() {},
 };
 </script>
 
@@ -76,6 +62,15 @@ export default {
   align-items: center;
 }
 .wrap/deep/ {
+  .u-card {
+    border: 1px solid #e4e7ed;
+  }
+  .u-border:after {
+    border-width: 0;
+  }
+  .u-card__head--left__title {
+    width: 350rpx;
+  }
   .u-card__head--right {
     min-width: 180rpx;
     text-align: right;
@@ -89,13 +84,18 @@ export default {
   width: 634rpx;
 }
 .body-image {
-  width:634rpx;
-  height:280rpx;
+  width: 634rpx;
+  height: 280rpx;
 }
 .body-text {
   color: $u-type-info;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>
