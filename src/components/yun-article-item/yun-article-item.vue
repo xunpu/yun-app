@@ -1,98 +1,101 @@
 <template>
-  <view class="wrap" @click="open">
-    <image class="item-img" :src="realSrc" mode="aspectFill" />
-    <view class="wrap-inline">
-      <text class="item-text">{{ this.name }}</text>
-      <text class="item-text mtime">{{ this.mtime }} {{ this.size }}</text>
-    </view>
-    <tui-icon
-      class="item-icon"
-      name="circle"
-      color="#CCC"
-      :size="21"
-      unit="rpx"
-    ></tui-icon>
+  <view class="wrap">
+    <u-card
+      :title="article.title"
+      :thumb="article.thumb"
+      :sub-title="article.ctime"
+      thumb-width="42"
+      thumb-height="42"
+      thumb-circle
+      margin="30rpx 40rpx 0 40rpx"
+      @head-click="open"
+      @body-click="open"
+      @foot-click="edit"
+    >
+      <view slot="body" class="body">
+        <image class="body-image" :src="article.image" mode="aspectFill"></image>
+        <view class="body-text">
+          <text class="real-text" v-html="article.text"></text>
+        </view>
+      </view>
+      <view slot="foot" class="card-foot">
+        <!-- <u-icon name="chat" size="28" color="" label="阅读原文"></u-icon> -->
+        <u-icon name="setting" size="28" margin-left="12" label="编辑"></u-icon>
+      </view>
+    </u-card>
   </view>
 </template>
 
 <script>
-const TYPE_IMG = { 1: "folder", 2: "file" };
 export default {
   props: {
-    type: {
+    article: {
       require: true,
-      default: 1,
-      type: Number,
-    },
-    name: {
-      require: true,
-      default: "?",
-      type: String,
-    },
-    path: {
-      default: "",
-      type: String,
-    },
-    url: {
-      default: "",
-      type: String,
-    },
-    mtime: {
-      default: "",
-      type: String,
-    },
-    size: {
-      default: "",
-      type: [String, Number],
     },
   },
   data() {
     return {};
   },
-  computed: {
-    realSrc() {
-      return `/static/${TYPE_IMG[this.type]}.png`;
-    },
-  },
+  computed: {},
   methods: {
-    open(src) {
-      this.$emit('current', this.name, this.path);
+    open() {
+      this.$emit("detail", { link: this.article.link });
+    },
+    edit() {
+      let that = this;
+      uni.navigateTo({
+        url: "/pages/article/edit?id=123123",
+        success: function (res) {
+          res.eventChannel.emit("acceptArticleData", { article: that.article });
+        },
+      });
     },
   },
-  mounted() {},
 };
 </script>
 
 <style lang="scss" scoped>
 .wrap {
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  padding: 28rpx 14rpx;
 }
-.wrap-inline {
-  width: calc(100% - 146rpx);
-  display: flex;
-  flex-direction: column;
-}
-.item-img {
-  margin-left: 28rpx;
-  width: 56rpx;
-  height: 56rpx;
-}
-.item-text {
-  font-size: 28rpx;
-  margin-left: 42rpx;
-  color: $u-content-color;
-  // overflow: hidden;
-  // white-space: nowrap;
-  // text-overflow: ellipsis;
-  &.mtime {
-    color: $u-light-color;
-    font-size: 24rpx;
+.wrap/deep/ {
+  .u-card {
+    border: 1px solid #e4e7ed;
+  }
+  .u-border:after {
+    border-width: 0;
+  }
+  .u-card__head--left__title {
+    width: 350rpx;
+  }
+  .u-card__head--right {
+    min-width: 180rpx;
+    text-align: right;
+  }
+  .u-card__head--left__thumb {
+    min-width: 48rpx;
+    min-height: 48rpx;
   }
 }
-.item-icon {
-  padding-left: 21rpx;
+.body {
+  width: 634rpx;
+}
+.body-image {
+  width: 634rpx;
+  height: 280rpx;
+}
+.body-text {
+  color: $u-type-info;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

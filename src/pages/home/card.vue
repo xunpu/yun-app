@@ -54,6 +54,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+uni-page-body {
+  background-color: #eee;
+}
 .opt-panel {
   padding: 200rpx 0;
   .opt-content {

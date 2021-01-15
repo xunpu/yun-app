@@ -3,6 +3,7 @@
 		"autoscan": true,
 		"^tui-(.*)": "thorui-uni/lib/thorui/tui-$1/tui-$1.vue",
 		"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
+		// "mp-html": "mp-html/dist/uni-app/components/mp-html/mp-html"
 	},
 	"pages": [{
 			"path": "pages/home/index",
@@ -58,6 +59,12 @@
 			"path": "pages/article/edit",
 			"style": {
 				"navigationBarTitleText": "文章"
+			}
+		},
+		{
+			"path": "pages/editor/index",
+			"style": {
+				"navigationBarTitleText": "编辑器"
 			}
 		}
 	],

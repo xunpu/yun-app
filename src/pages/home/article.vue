@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <yun-card-content :cardlist="cardlist"></yun-card-content>
+    <yun-article-content :articlelist="articlelist"></yun-article-content>
     <tui-fab
       :right="50"
       :bottom="150"
@@ -12,13 +12,13 @@
   
 <script>
 import storeCache from "@/store/cache.js";
-import { CARD_LIST } from "@/api/api";
+import { ARTICLE_LIST } from "@/api/api";
 
 export default {
   data() {
     return {
       path: "",
-      cardlist: [],
+      articlelist: [],
       newFolderPanelShow: false,
       newFolderForm: {},
     };
@@ -33,27 +33,30 @@ export default {
       });
     },
     initList() {
-      storeCache.on(CARD_LIST).then((res) => {
-        storeCache.next(CARD_LIST).then((res) => {
-          this.cardlist.push(res.data.cardlist);
+      storeCache.on(ARTICLE_LIST).then((res) => {
+        storeCache.next(ARTICLE_LIST).then((res) => {
+          this.articlelist.push(res.data.articlelist);
           uni.stopPullDownRefresh();
         });
       });
     },
     onPullDownRefresh() {
-      storeCache.delete(CARD_LIST);
-      this.cardlist = [];
+      storeCache.delete(ARTICLE_LIST);
+      this.articlelist = [];
       this.initList();
     },
     onReachBottom: function () {
-      storeCache.next(CARD_LIST).then((res) => {
-        this.cardlist.push(res.data.cardlist);
+      storeCache.next(ARTICLE_LIST).then((res) => {
+        this.articlelist.push(res.data.articlelist);
       });
     },
   },
 };
 </script>
 <style lang="scss" scoped>
+uni-page-body {
+  background-color: #eee;
+}
 .opt-panel {
   padding: 200rpx 0;
   .opt-content {

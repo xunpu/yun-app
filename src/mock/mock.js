@@ -29,6 +29,20 @@ Mock.mock(RegExp('/api/cards' + '.*'), 'post', {
     'next': '/cards?p=@integer(1,999)'
 })
 
+Mock.mock(RegExp('/api/articles' + '.*'), 'post', {
+    'articlelist|5': [{
+        'id': '@id',
+        'title': '@cword(2, 30)',
+        'text': '@cword(10, 50)',
+        'link': '@url',
+        'thumb': '@dataImage("48x48")',
+        'image': '@dataImage("158x70", "未上传")',
+        'ctime': '@date',
+        'mtime': '@date',
+    }],
+    'next': '/articles?p=@integer(1,999)'
+})
+
 Mock.mock(RegExp('/api/images' + '.*'), 'post', {
     'imageList|20': [{
         'id': '@id',

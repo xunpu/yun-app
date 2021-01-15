@@ -1,42 +1,55 @@
 <template>
   <view>
     <tui-list-view unlined="all">
-      <tui-list-cell
-        v-for="item in filelist"
-        :key="item.id"
-        unlined
-        padding="0 0"
-      >
-        <yun-files-item @current="getPath" v-bind="item"></yun-files-item>
-      </tui-list-cell>
+      <view v-for="(page, index) in articlelist" :key="index">
+        <tui-list-cell
+          v-for="item in page"
+          :key="item.id"
+          unlined
+          padding="0 0"
+          backgroundColor="transparent"
+        >
+          <yun-article-item @detail="detail" :article="item"></yun-article-item>
+        </tui-list-cell>
+      </view>
     </tui-list-view>
+    <u-modal
+      v-model="articleModal"
+      title="跳转到链接"
+      :show-cancel-button="true"
+      :content="link"
+      @confirm="goto"
+    ></u-modal>
   </view>
 </template>
 
 <script>
-import { getFiles } from "@/api/api";
 export default {
+  props: {
+    articlelist: {
+      require: true,
+    },
+  },
   data() {
     return {
+      link: "",
+      articleModal: false,
       curPath: "",
-      filelist: [],
     };
   },
   methods: {
-    getPath(name, path) {
-      this.$emit("change", name);
+    goto() {},
+    detail(params) {
+      this.link = params.link;
+      // this.articleModal = true;
     },
   },
-  mounted() {
-    getFiles().then((res) => {
-      console.log(res.data);
-      this.path = res.data.path;
-      this.filelist = res.data.filelist;
-    });
-  },
+  mounted() {},
 };
 </script>
 
 <style lang="scss" scoped>
-
+uni-page-body {
+  background-color: #eee;
+}
 </style>
