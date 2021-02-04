@@ -12,10 +12,11 @@ let app;
 
 http.setConfig(config => {
   Object.assign(config, {
-    baseUrl: `/api`,
+    baseUrl: '/api/api',
     header: {
-      'Content-Type': 'application/vnd.api+json',
-      Accept: 'application/vnd.api+json',
+      // 'Content-Type': 'application/vnd.api+json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      // Accept: 'application/vnd.api+json',
     },
   });
   // #ifdef MP-WEIXIN
@@ -135,9 +136,9 @@ http.interceptor.response(
         }
       });
     } else if (response.config.custom.showTost) {
-      uni.showToast({
-        title: response.errMsg
-      });
+      // uni.showToast({
+      //   title: response.errMsg
+      // });
     }
     return response;
   },

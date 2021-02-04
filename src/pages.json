@@ -50,6 +50,15 @@
 			}
 		},
 		{
+			"path": "pages/files/folder-view",
+			"style": {
+				"app-plus": {
+					"titleNView": false
+				},
+				"enablePullDownRefresh": true
+			}
+		},
+		{
 			"path": "pages/card/edit",
 			"style": {
 				"navigationBarTitleText": "卡片"
@@ -65,6 +74,18 @@
 			"path": "pages/editor/index",
 			"style": {
 				"navigationBarTitleText": "编辑器"
+			}
+		},
+		{
+			"path": "pages/account/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/account/register",
+			"style": {
+				"navigationBarTitleText": "注册"
 			}
 		}
 	],

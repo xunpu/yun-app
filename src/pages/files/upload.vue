@@ -5,7 +5,18 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      params: {},
+    };
+  },
+  onShow() {},
+  onHide() {},
+  onReady() {
+    let that = this;
+    const eventChannel = this.getOpenerEventChannel();
+    eventChannel.on("acceptUploadData", function (data) {
+      that.params = data;
+    });
   },
   onLoad() {},
   methods: {},

@@ -1,11 +1,11 @@
 <template>
   <u-upload
     :before-upload="onBeforeUpload"
-    :form-data="upload_formdata"
-    :action="upload_filepath"
+    :form-data="formdata"
+    :action="filepath"
     :file-list="filelist"
-    @on-success="onUploadSuccess"
     :custom-btn="true"
+    @on-success="onUploadSuccess"
     width="230"
     height="230"
     upload-text="选择图片"
@@ -19,20 +19,32 @@
       <u-icon name="plus" size="60" color="#c0c4cc"></u-icon>
     </view>
   </u-upload>
-  </template>
+</template>
 
 <script>
+import { UPLOAD_FILE_PATH } from "@/api/api";
+import { getToken } from "@/store/storage";
 export default {
   data() {
     return {
-      upload_formdata: {},
-      upload_filepath: "",
+      token: "",
+      filepath: UPLOAD_FILE_PATH,
       filelist: [],
     };
   },
   methods: {
     onBeforeUpload() {},
-    onUploadSuccess() {},
+    onUploadSuccess() {
+      uni.$emit("refreshFileList", {});
+    },
+  },
+  computed: {
+    formdata: function () {
+      return this.$parent._data.params;
+    },
+  },
+  mounted() {
+    // this.$nextTick((res) => {});
   },
 };
 </script>

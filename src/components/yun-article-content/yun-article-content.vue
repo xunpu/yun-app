@@ -24,7 +24,9 @@
 </template>
 
 <script>
+import yunArticleItem from '../yun-article-item/yun-article-item.vue';
 export default {
+  components: { yunArticleItem },
   props: {
     articlelist: {
       require: true,

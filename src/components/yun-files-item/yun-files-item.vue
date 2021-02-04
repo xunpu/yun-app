@@ -4,19 +4,13 @@
     @click="open"
     @touchstart="showOpt"
     @touchend="clearShowOpt"
+    @touchmove="clearShowOpt"
   >
     <image class="item-img" :src="realSrc" mode="aspectFill" />
     <view class="wrap-inline">
       <text class="item-text">{{ file.name }}</text>
       <text class="item-text mtime">{{ file.mtime }} {{ file.size }}</text>
     </view>
-    <!-- <tui-icon
-      class="item-icon"
-      name="circle"
-      color="#CCC"
-      :size="21"
-      unit="rpx"
-    ></tui-icon> -->
     <u-icon
       v-if="showCheck"
       :name="checkState ? 'checkmark-circle-fill' : 'minus-circle'"
@@ -38,6 +32,7 @@ export default {
     file: {
       require: true,
     },
+    onlyView: {},
   },
   data() {
     return {
@@ -52,11 +47,12 @@ export default {
   },
   methods: {
     showOpt() {
+      if (this.onlyView) return;
       let that = this;
       this.longTap = setTimeout(function () {
         that.$emit("event-bridge", { type: "show-icon" });
         that.checkState = true;
-        that.$emit("take-file", that.file);
+        // that.$emit("take-file", that.file);
       }, 1000);
     },
     clearShowOpt() {
@@ -65,7 +61,7 @@ export default {
     open(src) {
       if (this.showCheck === true) {
         this.checkState ? (this.checkState = false) : (this.checkState = true);
-      } else {
+      } else if (this.file.type != 2) {
         this.$emit("take-file", this.file);
       }
     },

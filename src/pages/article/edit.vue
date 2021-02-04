@@ -9,7 +9,6 @@
           mode="aspectFill"
           :src="form.image"
           @error="imageError"
-          @load="imageLoad"
         ></image>
         <u-button class="image-btn" @click="changeImage" :hair-line="false"
           >更改</u-button
@@ -46,7 +45,6 @@ export default {
   },
   methods: {
     imageError(e) {
-      console.log(111);
       this.form.image = this.default_image;
     },
     goToEditor() {

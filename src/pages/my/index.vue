@@ -1,8 +1,8 @@
 <template>
   <view>
     <view class="u-flex user-box">
-      <view class="u-m-r-10">
-        <u-avatar :src="avatar_path" size="140"></u-avatar>
+      <view>
+        <image @error="avatarError" :src="avatar_path" class="avatar"></image>
       </view>
       <view class="u-flex-1">
         <view class="u-tips">
@@ -14,56 +14,62 @@
           </template>
         </view>
       </view>
-      <view class="u-m-l-10 u-p-10">
-        <u-icon name="arrow-right" color="#969799" size="28"></u-icon>
+      <view>
+        <u-icon
+          @error="avatarError"
+          name="arrow-right"
+          color="#969799"
+          size="28"
+        ></u-icon>
       </view>
     </view>
-    <!-- <view class="u-m-t-20">
-      <u-cell-group>
-        <u-cell-item icon="rmb-circle" title="支付"></u-cell-item>
-        <u-cell-item icon="star" title="收藏"></u-cell-item>
-        <u-cell-item icon="heart" title="关注"></u-cell-item>
-        <u-cell-item icon="setting" title="设置"></u-cell-item>
-      </u-cell-group>
-    </view> -->
   </view>
 </template>
 
 <script>
+import { AVATAR_PATH } from "@/api/api";
+var default_avatar_path = "/static/avatar_logo.png";
 export default {
   data() {
     return {
-      avatar_path: "/static/avatar_logo.png",
+      avatar_path: default_avatar_path,
       logged: false,
       phone: "",
     };
   },
-  onReady() {
-    let that = this;
-    uni.getStorage({
-      key: "token",
-      success: (res) => {
-        uni.getStorage({
-          key: "phone",
-          success: (res2) => {
-            if (res.data && res2.data) {
-              that.logged = true;
-              that.phone = res2.data;
-              that.showAvatar();
-            }
-          },
-        });
-      },
-    });
+  onShow() {
+    this.setUser();
   },
-  onLoad() {},
   methods: {
-    nav2login() {
-      uni.navigateTo({
-        url: "./login",
+    setUser() {
+      let that = this;
+      uni.getStorage({
+        key: "token",
+        success: (res) => {
+          uni.getStorage({
+            key: "phone",
+            success: (res2) => {
+              if (res.data && res2.data) {
+                that.logged = true;
+                that.phone = res2.data;
+                that.showAvatar();
+              }
+            },
+          });
+        },
       });
     },
+    nav2login() {
+      uni.navigateTo({
+        url: "/pages/account/login",
+      });
+    },
+    avatarError() {
+      this.avatar_path = default_avatar_path;
+    },
     showAvatar() {
+      if (this.avatar_path !== "" || this.avatar_path !== default_avatar_path)
+        return;
       var phone = "";
       uni.getStorage({
         key: "phone",
@@ -72,7 +78,7 @@ export default {
         },
       });
       this.avatar_path =
-        `${avatar_path}?phone=${phone}#` + new Date().getTime();
+        `${AVATAR_PATH}?phone=${phone}#` + new Date().getTime();
     },
   },
 };
@@ -81,6 +87,10 @@ export default {
 <style lang="scss" scoped>
 page {
   background-color: #f5f5f5;
+}
+.avatar {
+  width: 160rpx;
+  height: 160rpx;
 }
 .camera {
   width: 54px;
@@ -91,7 +101,7 @@ page {
   }
 }
 .user-box {
-  padding: 96rpx 48rpx 48rpx;
+  padding: 48rpx 48rpx;
   background-color: #fff;
 }
 .u-tips {

@@ -5,7 +5,7 @@
       :right="50"
       :bottom="150"
       @click="navToEditor"
-      bgColor="#56b1fc"
+      bgColor="#81b71a"
     ></tui-fab>
   </view>
 </template>

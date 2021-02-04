@@ -171,7 +171,8 @@ export default class Request {
                 ...handleRe
             };
             // #ifdef H5
-            _config.data = JSON.stringify(_config.data);
+            // _config.data = JSON.stringify(_config.data);
+
             // #endif
             if (!next) return;
             const requestTask = uni.request({
@@ -194,10 +195,10 @@ export default class Request {
                     if (this.validateStatus(response.statusCode)) {
                         // 成功
                         response = this.requestComFun(response);
-                        resolve(response);
+                        resolve(response.data);
                     } else {
                         response = this.requestComFail(response);
-                        reject(response);
+                        reject(response).data;
                     }
                 },
             });

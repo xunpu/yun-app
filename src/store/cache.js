@@ -66,14 +66,14 @@ var Cache = (function () {
     }
   }
 
-  Cache.prototype.next = function (api, fetch_only = false) {
+  Cache.prototype.next = function (api, params = {}, fetch_only = false) {
     var path = getCurrentPage();
     var obj = this._data[path][api];
     if (obj.data.length >= 2) {
-      fetch(api, obj);
+      fetch(api, obj, 1, params);
     } else {
-      fetch(api, obj, 2);
-    }   
+      fetch(api, obj, 2, params);
+    }
     if (obj.data.length == 0 && obj.next == null) {
       return Promise.resolve(false);
     } else if (fetch_only === true) {
@@ -87,9 +87,13 @@ var Cache = (function () {
     }
   }
 
+  Cache.prototype.clean = function () {
+    var path = getCurrentPage();
+    this._data[path] = {}
+  }
+
   Cache.prototype.delete = function (api) {
     var path = getCurrentPage();
-    this._data[path][api]
     if (this._data[path] === undefined) {
       return Promise.resolve(false);
     } else if (path in this._data) {
@@ -99,7 +103,7 @@ var Cache = (function () {
     }
     return Promise.resolve(true);
   }
-  
+
   return Cache;
 }());
 
