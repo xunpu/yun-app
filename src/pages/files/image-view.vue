@@ -32,7 +32,7 @@
   
 <script>
 import { IMAGE_LIST } from "@/api/api";
-import storeCache from "@/store/cache.js";
+import storeCache from "@/store/cacheMock";
 export default {
   data() {
     return {

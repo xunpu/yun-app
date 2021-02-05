@@ -11,7 +11,7 @@
 </template>
   
 <script>
-import storeCache from "@/store/cache.js";
+import storeCache from "@/store/cacheMock";
 import { ARTICLE_LIST } from "@/api/api";
 
 export default {

@@ -19,7 +19,6 @@
       </view>
     </u-navbar>
     <yun-files-content
-      ref="myfile"
       :filelist="filelist"
       :onlyView="true"
       @multi-select="multiSelect"
@@ -30,7 +29,7 @@
   
 <script>
 import { getToken } from "@/store/storage";
-import storeCache from "@/store/cache2";
+import storeCache from "@/store/cache";
 import { FILE_LIST, move } from "@/api/api";
 export default {
   data() {

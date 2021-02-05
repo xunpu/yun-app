@@ -60,30 +60,52 @@
             <view class="wrap-inline" @click="addOptions('folder')">
               <image
                 class="opt-img"
-                src="/static/wenjianjia.png"
+                src="/static/btn-folder.png"
                 mode="aspectFill"
               />
-              <text>新文件夹</text>
+              <text>文件夹</text>
             </view>
           </u-col>
           <u-col span="4">
             <view class="wrap-inline" @click="addOptions('image')">
               <image
                 class="opt-img"
-                src="/static/tupian.png"
+                src="/static/btn-image.png"
                 mode="aspectFill"
               />
-              <text>上传图片</text>
+              <text>图片</text>
             </view>
           </u-col>
           <u-col span="4">
             <view class="wrap-inline" @click="addOptions('other')">
               <image
                 class="opt-img"
-                src="/static/weizhiwenjian.png"
+                src="/static/btn-other.png"
                 mode="aspectFill"
               />
-              <text>上传其它</text>
+              <text>文件</text>
+            </view>
+          </u-col>
+        </u-row>
+        <u-row class="opt-content">
+          <u-col span="4">
+            <view class="wrap-inline" @click="addOptions('card')">
+              <image
+                class="opt-img"
+                src="/static/btn-card.png"
+                mode="aspectFill"
+              />
+              <text>卡片</text>
+            </view>
+          </u-col>
+          <u-col span="4">
+            <view class="wrap-inline" @click="addOptions('article')">
+              <image
+                class="opt-img"
+                src="/static/btn-article.png"
+                mode="aspectFill"
+              />
+              <text>文章</text>
             </view>
           </u-col>
         </u-row>
@@ -118,7 +140,7 @@
   
 <script>
 import { getToken } from "@/store/storage";
-import storeCache from "@/store/cache2";
+import storeCache from "@/store/cache";
 import { FILE_LIST, mkdir, rename, remove } from "@/api/api";
 export default {
   data() {
@@ -230,8 +252,36 @@ export default {
           });
         });
       } else if (type == "other") {
-        uni.showToast({
-          title: "文件上传错误",
+        let that = this;
+        uni.chooseFile({
+          count: 1,
+          type: "all",
+          success: function (res) {
+            // console.log(JSON.stringify(res.tempFilePaths));
+            getToken().then((token) => {
+              uni.uploadFile({
+                url: "/api/api/v1/fs/upload", //仅为示例，非真实的接口地址
+                filePath: res.tempFilePaths[0],
+                formData: {
+                  path: that.path,
+                  name: that.name,
+                  pid: that.pid,
+                  token: token,
+                },
+                success: (uploadFileRes) => {
+                  console.log(uploadFileRes.data);
+                },
+              });
+            });
+          },
+        });
+      } else if (type == "card") {
+        uni.navigateTo({
+          url: "/pages/card/edit",
+        });
+      } else if (type == "article") {
+        uni.navigateTo({
+          url: "/pages/article/edit",
         });
       }
     },
@@ -247,7 +297,7 @@ export default {
       this.refreshFileList();
     },
     backEvent() {
-      if (this.pid == 'root') return;
+      if (this.pid == "root") return;
       this.filelist = [];
       var parent = this.queue.pop();
       this.pid = parent.uuid;
@@ -381,8 +431,11 @@ export default {
 <style lang="scss" scoped>
 .page/deep/ {
   .u-line-1 {
-    width: 45vw;
+    width: 45%;
     display: inline-block;
+  }
+  .u-back-text.u-line-1 {
+    width: 45vw;
   }
   .file-btn {
     width: 150rpx;
@@ -390,13 +443,14 @@ export default {
   }
 }
 .opt-panel {
-  padding: 200rpx 0;
+  padding: 100rpx 0;
   .opt-content {
+    margin-top: 50rpx;
     text-align: center;
     .opt-img {
       margin-bottom: 20rpx;
-      width: 96rpx;
-      height: 96rpx;
+      width: 84rpx;
+      height: 84rpx;
     }
   }
 }
