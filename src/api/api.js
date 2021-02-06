@@ -6,7 +6,8 @@ import mock from "@/mock/mock";
 // const FILE_LIST = '/files';
 const FILE_LIST = '/v1/fs/ls';
 const CARD_LIST = '/cards';
-const IMAGE_LIST = '/images';
+const IMAGE_LIST = '/v1/fs/ls';
+const IMAGE_VIEW = '/v1/fs/view';
 const ARTICLE_LIST = '/articles';
 const AVATAR_PATH = '/account/pre/avatar';
 const UPLOAD_FILE_PATH = '/api/api/v1/fs/upload';
@@ -16,6 +17,7 @@ export {
     CARD_LIST,
     ARTICLE_LIST,
     IMAGE_LIST,
+    IMAGE_VIEW,
     AVATAR_PATH,
     UPLOAD_FILE_PATH
 }

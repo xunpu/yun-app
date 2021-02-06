@@ -12,17 +12,19 @@
       <view class="page" v-for="(images, index) in imageList" :key="index">
         <tui-list-cell
           v-for="image in images"
-          :key="image.id"
+          :key="image.uuid"
           class="image-wrap"
           unlined
           padding="0 0"
           backgroundColor="transparent"
         >
           <image
-            @click="choose(image)"
             class="image-view"
-            :src="image.image"
             mode="aspectFit"
+            :src="image.url"
+            @click="choose(image)"
+            @error="imgError"
+            @load="imgLoad"
           ></image>
         </tui-list-cell>
       </view>
@@ -31,8 +33,9 @@
 </template>
   
 <script>
-import { IMAGE_LIST } from "@/api/api";
-import storeCache from "@/store/cacheMock";
+import { FILE_LIST, IMAGE_VIEW } from "@/api/api";
+import { getToken } from "@/store/storage";
+import storeCache from "@/store/cache";
 export default {
   data() {
     return {
@@ -42,9 +45,36 @@ export default {
     };
   },
   onLoad(option) {
-    this.initList();
+    this.refreshImageList();
   },
   methods: {
+    imgError() {
+      console.log(111);
+    },
+    imgLoad() {
+      console.log(222);
+    },
+    renderData(imageList) {
+      var data = {};
+      var render_data = [];
+      imageList.forEach((v, i) => {
+        data = {
+          id: v[0],
+          name: v[2],
+          type: v[3],
+          ext: v[4],
+          size: v[5],
+          pid: v[6],
+          path: v[7],
+          uuid: v[8],
+          ctime: `${v[9].split(" ")[0]} ${v[9].split(" ")[1]}`,
+          mtime: `${v[10].split(" ")[0]} ${v[10].split(" ")[1]}`,
+          url: `../../api/api${IMAGE_VIEW}/thumb/${v[8]}`,
+        };
+        render_data.push(data);
+      });
+      return render_data;
+    },
     choose(img) {
       let that = this;
       uni.navigateBack({
@@ -52,23 +82,43 @@ export default {
       });
       uni.$emit("acceptImageData", { image: img });
     },
-    initList() {
-      storeCache.on(IMAGE_LIST).then((res) => {
-        storeCache.next(IMAGE_LIST).then((res) => {
-          this.imageList.push(res.data.imageList);
-          uni.stopPullDownRefresh();
-        });
+    refreshImageList() {
+      this.imageList = [];
+      storeCache.delete(`${FILE_LIST}`);
+      let that = this;
+      getToken().then((token) => {
+        storeCache
+          .on(
+            `${FILE_LIST}`,
+            {},
+            { ext: ["png", "jpg", "gif", "svg"], token: token }
+          )
+          .then((res) => {
+            that.getImages();
+          });
+      });
+    },
+    getImages() {
+      getToken().then((token) => {
+        storeCache
+          .next(`${FILE_LIST}`, {
+            ext: ["png", "jpg", "gif", "svg"],
+            token: token,
+          })
+          .then((res) => {
+            if (res.data.length > 0) {
+              var data = this.renderData(res.data);
+              this.imageList.push(data);
+            }
+            uni.stopPullDownRefresh();
+          });
       });
     },
     onPullDownRefresh() {
-      storeCache.delete(IMAGE_LIST);
-      this.imageList = [];
-      this.initList();
+      this.refreshImageList();
     },
     onReachBottom: function () {
-      storeCache.next(IMAGE_LIST).then((res) => {
-        this.imageList.push(res.data.imageList);
-      });
+      this.getImages();
     },
   },
 };

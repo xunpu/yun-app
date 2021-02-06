@@ -39,7 +39,7 @@
 		{
 			"path": "pages/files/upload",
 			"style": {
-				"navigationBarTitleText": "上传文件"
+				"navigationBarTitleText": "上传图片"
 			}
 		},
 		{
