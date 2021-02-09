@@ -15,7 +15,9 @@
             <image class="cap" @click="changeCap" v-bind:src="captcha.src" />
           </u-form-item>
         </u-form>
-        <u-button class="submit" shape="circle" :ripple="true" @click="submit">提交</u-button>
+        <u-button class="submit" shape="circle" :ripple="true" @click="submit"
+          >提交</u-button
+        >
         <u-button @click="navToLogin" class="reg">
           已有账号返回
           <view class="reg-text">登录</view>
@@ -106,6 +108,7 @@ export default {
             password_salt: password_salt,
           }).then((res) => {
             if (res.code != 0) {
+              console.log(999, res);
               this.$refs.loginToast.show({
                 title: res.msg,
                 callback: (res) => {
@@ -124,7 +127,13 @@ export default {
                 key: "token",
                 data: res.data.token,
                 success: function () {
-                  that.registerSuccess(res.data);
+                  uni.setStorage({
+                    key: "phone",
+                    data: res.data.phone,
+                    success: function () {
+                      that.registerSuccess(res.data);
+                    },
+                  });
                 },
               });
             }
@@ -141,9 +150,7 @@ export default {
       this.navToAccount();
     },
     navToAccount() {
-      uni.redirectTo({
-        url: "/pages/my/index",
-      });
+      uni.switchTab({ url: "/pages/my/index" });
     },
     navToLogin() {
       uni.redirectTo({
@@ -191,7 +198,6 @@ export default {
   border: 0;
 }
 .reg view {
-  // color: red;
   color: darken($u-type-info, 25%);
 }
 </style>

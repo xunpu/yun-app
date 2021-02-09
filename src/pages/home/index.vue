@@ -141,7 +141,7 @@
 <script>
 import { getToken } from "@/store/storage";
 import storeCache from "@/store/cache";
-import { FILE_LIST, mkdir, rename, remove } from "@/api/api";
+import { API_PATH, FILE_LIST, mkdir, rename, remove } from "@/api/api";
 export default {
   data() {
     return {
@@ -252,7 +252,6 @@ export default {
           });
         });
       } else if (type == "other") {
-        let that = this;
         uni.chooseFile({
           count: 1,
           type: "all",
@@ -260,7 +259,7 @@ export default {
             // console.log(JSON.stringify(res.tempFilePaths));
             getToken().then((token) => {
               uni.uploadFile({
-                url: "/api/api/v1/fs/upload", //仅为示例，非真实的接口地址
+                url: `${API_PATH}/v1/fs/upload`, //仅为示例，非真实的接口地址
                 filePath: res.tempFilePaths[0],
                 formData: {
                   path: that.path,
@@ -278,10 +277,16 @@ export default {
       } else if (type == "card") {
         uni.navigateTo({
           url: "/pages/card/edit",
+          success: function (res) {
+            res.eventChannel.emit("acceptCardData", { pid: that.pid });
+          },
         });
       } else if (type == "article") {
         uni.navigateTo({
           url: "/pages/article/edit",
+          success: function (res) {
+            res.eventChannel.emit("acceptArticleData", { pid: that.pid });
+          },
         });
       }
     },
@@ -357,6 +362,12 @@ export default {
       return render_data;
     },
   },
+  onShow() {
+    this.refreshFileList();
+  },
+  onHide() {
+    this.filelist = [];
+  },
   onReady() {
     uni.$on("refreshFileList", (res) => {
       this.refreshFileList();
@@ -424,7 +435,6 @@ export default {
         },
       });
     });
-    this.refreshFileList();
   },
 };
 </script>

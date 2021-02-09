@@ -11,6 +11,7 @@
           </template>
           <template v-else>
             <view v-html="phone"></view>
+            <view @click="logout2">登出</view>
           </template>
         </view>
       </view>
@@ -27,7 +28,8 @@
 </template>
 
 <script>
-import { AVATAR_PATH } from "@/api/api";
+import { AVATAR_PATH, logout } from "@/api/api";
+import { getToken } from "@/store/storage";
 var default_avatar_path = "/static/avatar_logo.png";
 export default {
   data() {
@@ -79,6 +81,27 @@ export default {
       });
       this.avatar_path =
         `${AVATAR_PATH}?phone=${phone}#` + new Date().getTime();
+    },
+    logout2() {
+      let that = this;
+      getToken().then((token) => {
+        logout({ token: token }).then((res) => {
+          if (res.code == 0) {
+            uni.removeStorage({
+              key: "phone",
+              success: () => {
+                uni.setStorage({
+                  key: "token",
+                  data: res.data.token,
+                  success: (res) => {
+                    that.logged = false;
+                  },
+                });
+              },
+            });
+          }
+        });
+      });
     },
   },
 };

@@ -2,8 +2,7 @@
   <view class="wrap">
     <u-card
       :title="card.title"
-      :thumb="card.thumb"
-      :sub-title="card.ctime"
+      :sub-title="card.mtime"
       thumb-width="42"
       thumb-height="42"
       thumb-circle
@@ -13,9 +12,9 @@
       @foot-click="edit"
     >
       <view slot="body" class="body">
-        <image class="body-image" :src="card.image" mode="aspectFill"></image>
+        <image class="body-image" :src="card.img_url" mode="aspectFill"></image>
         <view class="body-text">
-          <text class="real-text" v-html="card.text"></text>
+          <text class="real-text" v-html="card.desc"></text>
         </view>
       </view>
       <view slot="foot" class="card-foot">
@@ -44,9 +43,9 @@ export default {
     edit() {
       let that = this;
       uni.navigateTo({
-        url: "/pages/card/edit?id=123123",
+        url: "/pages/card/edit",
         success: function (res) {
-          res.eventChannel.emit("acceptCardData", { card: that.card });
+          res.eventChannel.emit("acceptCardData", { card: that.card}, true);
         },
       });
     },

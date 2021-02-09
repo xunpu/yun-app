@@ -43,7 +43,7 @@ export default {
     goto() {},
     detail(params) {
       this.link = params.link;
-      // this.articleModal = true;
+      this.articleModal = true;
     },
   },
   mounted() {},

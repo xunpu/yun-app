@@ -87,6 +87,13 @@
 			"style": {
 				"navigationBarTitleText": "注册"
 			}
+		},
+
+		{
+			"path": "pages/preview/article",
+			"style": {
+				"navigationBarTitleText": "文章预览"
+			}
 		}
 	],
 	"tabBar": {

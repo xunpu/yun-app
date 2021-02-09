@@ -3,7 +3,7 @@
     <u-card
       :title="article.title"
       :thumb="article.thumb"
-      :sub-title="article.ctime"
+      :sub-title="article.mtime"
       thumb-width="42"
       thumb-height="42"
       thumb-circle
@@ -13,7 +13,11 @@
       @foot-click="edit"
     >
       <view slot="body" class="body">
-        <image class="body-image" :src="article.image" mode="aspectFill"></image>
+        <image
+          class="body-image"
+          :src="article.img_url"
+          mode="aspectFill"
+        ></image>
         <view class="body-text">
           <text class="real-text" v-html="article.text"></text>
         </view>
@@ -39,14 +43,29 @@ export default {
   computed: {},
   methods: {
     open() {
-      this.$emit("detail", { link: this.article.link });
+      let that = this;
+      uni.navigateTo({
+        url: "/pages/preview/article",
+        success: function (res) {
+          res.eventChannel.emit(
+            "acceptArticleContent",
+            that.article,
+            true
+          );
+        },
+      });
+      // this.$emit("detail", { link: this.article.link });
     },
     edit() {
       let that = this;
       uni.navigateTo({
-        url: "/pages/article/edit?id=123123",
+        url: "/pages/article/edit",
         success: function (res) {
-          res.eventChannel.emit("acceptArticleData", { article: that.article });
+          res.eventChannel.emit(
+            "acceptArticleData",
+            { article: that.article },
+            true
+          );
         },
       });
     },

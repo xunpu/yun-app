@@ -3,23 +3,27 @@ import {
 } from "@/api/http";
 import mock from "@/mock/mock";
 
+const API_PATH = '/api/api';
 // const FILE_LIST = '/files';
 const FILE_LIST = '/v1/fs/ls';
-const CARD_LIST = '/cards';
+const CARD_LIST = '/v1/card/ls';
+const ARTICLE_LIST = '/v1/article/ls';
 const IMAGE_LIST = '/v1/fs/ls';
 const IMAGE_VIEW = '/v1/fs/view';
-const ARTICLE_LIST = '/articles';
 const AVATAR_PATH = '/account/pre/avatar';
-const UPLOAD_FILE_PATH = '/api/api/v1/fs/upload';
+const UPLOAD_FILE_PATH = `${API_PATH}/v1/fs/upload`;
+const IMAGE_URL = `${API_PATH}${IMAGE_VIEW}`
 
 export {
+    API_PATH,
     FILE_LIST,
     CARD_LIST,
     ARTICLE_LIST,
     IMAGE_LIST,
     IMAGE_VIEW,
     AVATAR_PATH,
-    UPLOAD_FILE_PATH
+    UPLOAD_FILE_PATH,
+    IMAGE_URL
 }
 
 export const getFiles = function () {
@@ -38,12 +42,17 @@ export const getImages = function (params) {
     return http.post(`${IMAGE_LIST}?p=1`, params)
 }
 
+// 用户
 export const login = function (params) {
     return http.post('/account/login', params)
 }
 
 export const register = function (params) {
     return http.post('/account/register', params)
+}
+
+export function logout(params) {
+    return http.post('/account/logout', params)
 }
 
 export const getCaptcha = function (params) {
@@ -62,6 +71,8 @@ export const modifyPasswd = function (params) {
     return http.post('/account/modify', params)
 }
 
+
+// 文件
 export const mkdir = function (params) {
     return http.post('/v1/fs/mkdir', params)
 }
@@ -76,4 +87,38 @@ export const remove = function (params) {
 
 export const move = function (params) {
     return http.post('/v1/fs/move', params)
+}
+
+// 卡片
+export const createCard = function (params) {
+    return http.post('/v1/card/create', params)
+}
+
+export const viewCard = function (params) {
+    return http.post('/v1/card/view', params)
+}
+
+export const modifyCard = function (params) {
+    return http.post('/v1/card/modify', params)
+}
+
+export const listCard = function (params) {
+    return http.post('/v1/card/ls', params)
+}
+
+// 文章
+export const createArticle = function (params) {
+    return http.post('/v1/article/create', params)
+}
+
+export const viewArticle = function (params) {
+    return http.post('/v1/article/view', params)
+}
+
+export const modifyArticle = function (params) {
+    return http.post('/v1/article/modify', params)
+}
+
+export const listArticle = function (params) {
+    return http.post('/v1/article/ls', params)
 }

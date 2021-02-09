@@ -1,13 +1,13 @@
 <template>
   <view>
-    <u-upload
+    <!-- <u-upload
       ref="upload"
       :action="action"
       :deletable="false"
       :file-list="fileList"
       upload-text="上传图片"
       max-count="1"
-    ></u-upload>
+    ></u-upload> -->
     <tui-list-view unlined="all">
       <view class="page" v-for="(images, index) in imageList" :key="index">
         <tui-list-cell
@@ -23,8 +23,6 @@
             mode="aspectFit"
             :src="image.url"
             @click="choose(image)"
-            @error="imgError"
-            @load="imgLoad"
           ></image>
         </tui-list-cell>
       </view>
@@ -33,27 +31,23 @@
 </template>
   
 <script>
-import { FILE_LIST, IMAGE_VIEW } from "@/api/api";
+import { FILE_LIST, IMAGE_URL } from "@/api/api";
 import { getToken } from "@/store/storage";
 import storeCache from "@/store/cache";
 export default {
   data() {
     return {
+      from: "",
       action: "",
       imageList: [],
       fileList: [],
     };
   },
   onLoad(option) {
+    this.from = option.from;
     this.refreshImageList();
   },
   methods: {
-    imgError() {
-      console.log(111);
-    },
-    imgLoad() {
-      console.log(222);
-    },
     renderData(imageList) {
       var data = {};
       var render_data = [];
@@ -69,7 +63,7 @@ export default {
           uuid: v[8],
           ctime: `${v[9].split(" ")[0]} ${v[9].split(" ")[1]}`,
           mtime: `${v[10].split(" ")[0]} ${v[10].split(" ")[1]}`,
-          url: `../../api/api${IMAGE_VIEW}/thumb/${v[8]}`,
+          url: `${IMAGE_URL}/thumb/${v[8]}?id=${v[11]}`,
         };
         render_data.push(data);
       });
@@ -80,7 +74,11 @@ export default {
       uni.navigateBack({
         delta: 1,
       });
-      uni.$emit("acceptImageData", { image: img });
+      if (this.from == 'article') {
+        uni.$emit("acceptArticleImageChooseData", { img: img });
+      } else {
+        uni.$emit("acceptImageData", { img: img });
+      }
     },
     refreshImageList() {
       this.imageList = [];
@@ -91,7 +89,7 @@ export default {
           .on(
             `${FILE_LIST}`,
             {},
-            { ext: ["png", "jpg", "gif", "svg"], token: token }
+            { ext: ["png", "jpg", "gif", "svg"], token: token, range: "all" }
           )
           .then((res) => {
             that.getImages();
@@ -104,6 +102,7 @@ export default {
           .next(`${FILE_LIST}`, {
             ext: ["png", "jpg", "gif", "svg"],
             token: token,
+            range: "all",
           })
           .then((res) => {
             if (res.data.length > 0) {

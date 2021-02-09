@@ -22,7 +22,8 @@
 </template>
 
 <script>
-const TYPE_IMG = { 1: "folder", 2: "file" };
+import { viewCard } from "@/api/api";
+const TYPE_IMG = { 1: "folder", 2: "other", 3: "card", 4: "article" };
 export default {
   props: {
     showCheck: {
@@ -42,7 +43,13 @@ export default {
   },
   computed: {
     realSrc() {
-      return `/static/${TYPE_IMG[this.file.type]}.png`;
+      if (
+        this.file.type == 2 &&
+        "png jpg gif svg".indexOf(this.file.ext) >= 0
+      ) {
+        return `/static/btn-image.png`;
+      }
+      return `/static/btn-${TYPE_IMG[this.file.type]}.png`;
     },
   },
   methods: {
@@ -61,8 +68,16 @@ export default {
     open(src) {
       if (this.showCheck === true) {
         this.checkState ? (this.checkState = false) : (this.checkState = true);
-      } else if (this.file.type != 2) {
+      } else if (this.file.type == 1) {
         this.$emit("take-file", this.file);
+      } else if (this.file.type == 3) {
+        // let that = this;
+        // uni.navigateTo({
+        //   url: "/pages/card/edit",
+        //   success: function (res) {
+        //     res.eventChannel.emit("acceptCardData", { card: that.file }, true);
+        //   },
+        // });
       }
     },
   },
@@ -91,9 +106,9 @@ export default {
   font-size: 28rpx;
   margin-left: 42rpx;
   color: $u-content-color;
-  // overflow: hidden;
-  // white-space: nowrap;
-  // text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   &.mtime {
     color: $u-light-color;
     font-size: 24rpx;

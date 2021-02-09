@@ -1,20 +1,28 @@
 <template>
   <view class="warp">
-    <u-form :model="form" ref="card">
-      <u-form-item label="标题"><u-input v-model="form.title" /></u-form-item>
-      <u-form-item label="简介"><u-input v-model="form.desc" /></u-form-item>
-      <u-form-item label="内容"
-        ><u-input v-model="form.text" type="textarea"
+    <u-form :model="form" ref="cardForm">
+      <u-form-item label="名称" prop="name"
+        ><u-input v-model="form.name"
       /></u-form-item>
-      <u-form-item label="链接"><u-input v-model="form.link" /></u-form-item>
-      <u-form-item class="image-wrap" label="图片">
+      <u-form-item label="标题" prop="title"
+        ><u-input v-model="form.title"
+      /></u-form-item>
+      <u-form-item label="简介" prop="desc"
+        ><u-input v-model="form.desc" type="textarea"
+      /></u-form-item>
+      <u-form-item label="链接" prop="link"
+        ><u-input v-model="form.link"
+      /></u-form-item>
+      <u-form-item class="image-wrap" prop="img" label="图片">
         <image
-          v-if="form.image"
+          v-if="imgUrl"
           class="pre-image"
-          mode="aspectFill"
-          :src="form.image"
+          mode="aspectFit"
+          :src="imgUrl"
         ></image>
-        <u-button class="image-btn" @click="chooseImage" :hair-line="false">更改</u-button>
+        <u-button class="image-btn" @click="chooseImage" :hair-line="false"
+          >更改</u-button
+        >
       </u-form-item>
     </u-form>
     <u-button class="submit" @click="submit" type="primary">提交</u-button>
@@ -22,37 +30,129 @@
 </template>
 
 <script>
-import { getCards } from "@/api/api";
+import { createCard, modifyCard } from "@/api/api";
+import { getToken } from "@/store/storage";
 export default {
   data() {
     return {
-      action: "",
       fileList: [],
-      form: {},
+      action: "",
+      imgUrl: "",
+      isModify: false,
+      pid: "",
+      rules: {
+        name: {
+          required: true,
+          message: "请输入名称",
+          trigger: "blur",
+        },
+        title: {
+          required: true,
+          message: "请输入标题",
+          trigger: "blur",
+        },
+        desc: {
+          required: true,
+          message: "请输入简介",
+          trigger: "blur",
+        },
+        link: {
+          required: true,
+          message: "请输入链接",
+          trigger: "blur",
+        },
+        img: {
+          required: true,
+          message: "请选择一张图片",
+          trigger: "blur",
+        },
+      },
+      form: {
+        title: "",
+        name: "",
+        desc: "",
+        link: "",
+        img: "",
+      },
     };
   },
   methods: {
     choose() {
-      this.form.image = "";
+      // this.form.image = "";
     },
     chooseImage() {
       uni.navigateTo({
-        url: "/pages/files/image-view?id=",
+        url: "/pages/files/image-view",
       });
     },
     beforeUpload() {},
-    submit() {},
+    submit() {
+      this.$refs.cardForm
+        .validate((vaild) => {
+          if (vaild) {
+            return Promise.resolve(true);
+          } else {
+            return Promise.resolve(false);
+          }
+        })
+        .then((res) => {
+          if (res == false) {
+            return;
+          }
+          getToken().then((token) => {
+            this.form.pid = this.pid;
+            this.form.token = token;
+            if (this.isModify) {
+              modifyCard(this.form).then((res) => {
+                if (res.code == 0) {
+                  uni.navigateBack({
+                    delta: 1,
+                  });
+                  uni.$emit("refreshFileList");
+                } else {
+                  uni.showToast({
+                    title: res.msg,
+                  });
+                }
+              });
+            } else {
+              createCard(this.form).then((res) => {
+                if (res.code == 0) {
+                  uni.navigateBack({
+                    delta: 1,
+                  });
+                  uni.$emit("refreshFileList");
+                } else {
+                  uni.showToast({
+                    title: res.msg,
+                  });
+                }
+              });
+            }
+          });
+        });
+    },
+  },
+  onReady() {
+    this.$refs.cardForm.setRules(this.rules);
   },
   onLoad(params) {
     let that = this;
     const eventChannel = this.getOpenerEventChannel();
-    eventChannel.on("acceptCardData", function (res) {
-      let card = res["card"];
-      that.form = card;
+    eventChannel.on("acceptCardData", function (res, modify = false) {
+      if (res["card"] == undefined) {
+        that.form = {};
+      } else {
+        that.form = res["card"];
+        that.imgUrl = res["card"]["img_url"];
+      }
+      that.pid = res["pid"];
+      that.isModify = modify;
     });
     uni.$on("acceptImageData", (res) => {
-      let img = res["image"];
-      that.form.image = img.image;
+      let img = res["img"];
+      this.imgUrl = img.url;
+      this.form.img = img.uuid;
     });
   },
 };
@@ -68,14 +168,14 @@ export default {
   align-items: flex-start;
 }
 .image-btn {
-  margin-left: 20rpx;
+  // margin-left: 20rpx;
   width: 140rpx;
   height: 140rpx;
   border-width: 0;
 }
 .pre-image {
-  width: 317rpx;
-  height: 140rpx;
+  width: 200rpx;
+  height: 150rpx;
   border-radius: 10rpx;
 }
 .submit {

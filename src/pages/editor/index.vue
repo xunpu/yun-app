@@ -35,7 +35,7 @@
           name="share"
           label-pos="bottom"
           margin-top="12"
-          label="卡片"
+          label="链接"
           label-size="24"
         ></u-icon
       ></u-button>
@@ -64,10 +64,38 @@
         ></u-icon
       ></u-button>
     </view>
+    <u-modal
+      v-model="addVideoSrcPanel"
+      show-cancel-button
+      title="视频地址：外站 iframe 中的 src"
+      :zoom="false"
+      @cancel="cancelAddVideoSrcPanel"
+      @confirm="submitAddVideoSrcPanel"
+    >
+      <view class="new-folder-popup">
+        <u-input
+          v-model="videoSrc"
+          placeholder="player.bilibili.com/player.html?aid=73801474"
+        />
+      </view>
+    </u-modal>
+    <u-modal
+      v-model="addLinkPanel"
+      show-cancel-button
+      title="请输入链接"
+      :zoom="false"
+      @cancel="cancelAddLinkPanel"
+      @confirm="submitAddLinkPanel"
+    >
+      <view class="new-folder-popup">
+        <u-input v-model="link" />
+      </view>
+    </u-modal>
   </view>
 </template>
 <script>
 import mphtml from "@/components/mp-html/mp-html";
+import { IMAGE_URL } from "@/api/api";
 export default {
   components: {
     "mp-html": mphtml,
@@ -77,11 +105,32 @@ export default {
       buttonStyle: {
         "border-width": 0,
       },
+      addVideoSrcPanel: false,
+      addLinkPanel: false,
+      videoSrc: "",
+      link: "",
       html: "",
+      chooseImg: null,
       article: {},
     };
   },
   methods: {
+    cancelAddVideoSrcPanel() {
+      this.addVideoSrcPanel = false;
+      this.videoSrc = "";
+    },
+    submitAddVideoSrcPanel() {
+      this.addVideoSrcPanel = false;
+      this.$refs.editor.insertVideo();
+    },
+    cancelAddLinkPanel() {
+      this.addLinkPanel = false;
+      this.link = "";
+    },
+    submitAddLinkPanel() {
+      this.addLinkPanel = false;
+      this.$refs.editor.insertLink();
+    },
     scrollBottom() {
       this.$refs.editor
         .getRect()
@@ -100,38 +149,60 @@ export default {
       this.scrollBottom();
     },
     insertImg() {
-      this.$refs.editor.insertImg();
+      uni.navigateTo({
+        url: "/pages/files/image-view?from=article",
+        success: (res) => {},
+      });
       this.scrollBottom();
     },
     insertLink() {
-      this.$refs.editor.insertLink();
+      this.addLinkPanel = true;
+      this.link = "";
       this.scrollBottom();
     },
     insertVideo() {
-      this.$refs.editor.insertVideo();
+      this.addVideoSrcPanel = true;
+      this.videoSrc = "";
       this.scrollBottom();
     },
     getContent() {
-      console.log(this.$refs.editor.getContent());
+      var richtext = this.$refs.editor.getContent();
+      uni.$emit("acceptContentData", { richtext: richtext });
+      uni.showToast({
+        title: "保存成功",
+        duration: 1000,
+        complete: (res) => {
+          let timeout = setTimeout((res) => {
+            clearTimeout(timeout);
+            uni.navigateBack({ delta: 1 });
+          }, 1000);
+        },
+      });
     },
   },
   onLoad() {},
+  onUnload() {
+    uni.$off("acceptArticleImageChooseData");
+    uni.$off("acceptArticleData");
+  },
   onReady() {
     let that = this;
+    uni.$on("acceptArticleImageChooseData", (data) => {
+      that.chooseImg = data.img;
+      that.$refs.editor.insertImg();
+    });
     const eventChannel = this.getOpenerEventChannel();
-    eventChannel.on("acceptArticleData", function (data) {
+    eventChannel.on("acceptArticleData", (data) => {
+      that.html = data.article.content;
       that.article = data.article;
       that.$refs.editor.getSrc = (type, value) => {
         return new Promise((resolve, reject) => {
           if (type == "img") {
-            // resolve(that.article.link);
-            resolve("/static/avatar_logo.png");
+            resolve(that.chooseImg.url);
           } else if (type == "link") {
-            resolve(that.article.link);
+            resolve(that.link);
           } else if ((type = "video")) {
-            resolve(
-              "https://player.bilibili.com/player.html?aid=886051604&bvid=BV1fK4y1p7TN&cid=280017300"
-            );
+            resolve(that.videoSrc);
           }
         });
       };
@@ -166,5 +237,8 @@ export default {
   height: 100rpx;
   width: 50vw;
   display: flex;
+}
+.new-folder-popup {
+  padding: 0 75rpx;
 }
 </style>
