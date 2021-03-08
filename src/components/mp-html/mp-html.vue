@@ -1,5 +1,5 @@
 <template>
-  <view id="_root" :class="(selectable?'_select ':'')+'_root'">
+  <view :style="editable?'position:relative':''" id="_root" :class="(selectable?'_select ':'')+'_root'">
     <slot v-if="!nodes[0]" />
     <!-- #ifndef APP-PLUS-NVUE -->
     <node v-else :childs="nodes" :opts="[lazyLoad,loadingImg,errorImg,showImgMenu,editable,'nodes']" />
@@ -7,18 +7,20 @@
     <!-- #ifdef APP-PLUS-NVUE -->
     <web-view ref="web" src="/static/app-plus/mp-html/local.html" :style="'margin-top:-2px;height:' + height + 'px'" @onPostMessage="_onMessage" />
     <!-- #endif -->
-    <view v-if="tooltip" class="_tooltip" :style="'top:'+tooltip.top+'px'">
-      <view v-for="(item, index) in tooltip.items" v-bind:key="index" class="_tooltip_item" :data-i="index" @tap="_tooltipTap">{{item}}</view>
+    <view v-if="tooltip" class="_tooltip_contain" :style="'top:'+tooltip.top+'px'">
+      <view class="_tooltip">
+        <view v-for="(item, index) in tooltip.items" v-bind:key="index" class="_tooltip_item" :data-i="index" @tap="_tooltipTap">{{item}}</view>
+      </view>
     </view>
     <view v-if="slider" class="_slider" :style="'top:'+slider.top+'px'">
-      <slider :value="slider.value" :min="slider.min" :max="slider.max" block-size="14" show-value activeColor="white" style="padding:5px 0;" @changing="_sliderChanging" @change="_sliderChange" />
+      <slider :value="slider.value" :min="slider.min" :max="slider.max" handle-size="14" block-size="14" show-value activeColor="white" style="padding:3px" @changing="_sliderChanging" @change="_sliderChange" />
     </view>
   </view>
 </template>
 
 <script>
 /**
- * mp-html v2.0.2
+ * mp-html v2.0.4
  * @description 富文本组件
  * @tutorial https://github.com/jin-yufeng/mp-html
  * @property {String} content 用于渲染的 html 字符串
@@ -41,7 +43,6 @@
  * @event {Function} linkTap 链接被点击时触发
  * @event {Function} error 媒体加载出错时触发
  */
-
 const plugins=[require('./editable/index.js'),]
 const parser = require('./parser')
 // #ifndef APP-PLUS-NVUE
@@ -97,7 +98,7 @@ export default {
     selectable: Boolean,
     setTitle: {
       type: Boolean,
-      value: true
+      default: true
     },
     showImgMenu: {
       type: Boolean,
@@ -429,11 +430,17 @@ export default {
 /* #endif */
 
 /* 提示条 */
+._tooltip_contain {
+  position: absolute;
+  width: 100vw;
+  text-align: center;
+}
+
 ._tooltip {
   display: inline-block;
   width: auto;
   height: 30px;
-  padding-right: 5px;
+  padding: 0 3px;
   font-size: 14px;
   line-height: 30px;
 }
@@ -441,7 +448,7 @@ export default {
 ._tooltip_item {
   display: inline-block;
   width: auto;
-  padding: 0 8px;
+  padding: 0 2vw;
   line-height: 30px;
   background-color: black;
   color: white;
@@ -449,13 +456,13 @@ export default {
 
 /* 图片宽度滚动条 */
 ._slider {
+  position: absolute;
+  left: 20px;
   width: 220px;
 }
 
 ._tooltip,
 ._slider {
-  position: absolute;
-  left: 30px;
   background-color: black;
   border-radius: 3px;
   opacity: 0.75;

@@ -40,6 +40,18 @@
         ></u-icon
       ></u-button>
       <u-button
+        @click="insertCard"
+        :custom-style="buttonStyle"
+        :hair-line="false"
+        ><u-icon
+          name="photo-fill"
+          label-pos="bottom"
+          margin-top="12"
+          label="卡片"
+          label-size="24"
+        ></u-icon
+      ></u-button>
+      <u-button
         @click="insertVideo"
         :custom-style="buttonStyle"
         :hair-line="false"
@@ -75,7 +87,7 @@
       <view class="new-folder-popup">
         <u-input
           v-model="videoSrc"
-          placeholder="player.bilibili.com/player.html?aid=73801474"
+          placeholder="https://player.bilibili.com/player.html?aid=73801474"
         />
       </view>
     </u-modal>
@@ -88,14 +100,15 @@
       @confirm="submitAddLinkPanel"
     >
       <view class="new-folder-popup">
-        <u-input v-model="link" />
+        <u-input v-model="linkName" placeholder="链接名称" />
+        <u-input v-model="link" placeholder="http://www.pyforce.com" />
       </view>
     </u-modal>
   </view>
 </template>
 <script>
-import mphtml from "@/components/mp-html/mp-html";
-import { IMAGE_URL } from "@/api/api";
+// import mphtml from "@/components/mp-html/mp-html";
+import mphtml from "mp-html/dist/uni-app/components/mp-html/mp-html";
 export default {
   components: {
     "mp-html": mphtml,
@@ -108,9 +121,11 @@ export default {
       addVideoSrcPanel: false,
       addLinkPanel: false,
       videoSrc: "",
+      linkName: "",
       link: "",
       html: "",
       chooseImg: null,
+      chooseCard: null,
       article: {},
     };
   },
@@ -125,6 +140,7 @@ export default {
     },
     cancelAddLinkPanel() {
       this.addLinkPanel = false;
+      this.linkName = "";
       this.link = "";
     },
     submitAddLinkPanel() {
@@ -151,13 +167,18 @@ export default {
     insertImg() {
       uni.navigateTo({
         url: "/pages/files/image-view?from=article",
-        success: (res) => {},
       });
-      this.scrollBottom();
     },
     insertLink() {
       this.addLinkPanel = true;
+      this.linkName = "";
       this.link = "";
+      this.scrollBottom();
+    },
+    insertCard() {
+      uni.navigateTo({
+        url: "/pages/files/card-view?from=article",
+      });
       this.scrollBottom();
     },
     insertVideo() {
@@ -183,6 +204,7 @@ export default {
   onLoad() {},
   onUnload() {
     uni.$off("acceptArticleImageChooseData");
+    uni.$off("acceptArticleCardChooseData");
     uni.$off("acceptArticleData");
   },
   onReady() {
@@ -190,6 +212,10 @@ export default {
     uni.$on("acceptArticleImageChooseData", (data) => {
       that.chooseImg = data.img;
       that.$refs.editor.insertImg();
+    });
+    uni.$on("acceptArticleCardChooseData", (data) => {
+      that.chooseCard = data.card;
+      that.$refs.editor.insertCard();
     });
     const eventChannel = this.getOpenerEventChannel();
     eventChannel.on("acceptArticleData", (data) => {
@@ -200,9 +226,11 @@ export default {
           if (type == "img") {
             resolve(that.chooseImg.url);
           } else if (type == "link") {
-            resolve(that.link);
-          } else if ((type = "video")) {
+            resolve({ name: that.linkName, link: that.link });
+          } else if (type == "video") {
             resolve(that.videoSrc);
+          } else if (type == "card") {
+            resolve(that.chooseCard);
           }
         });
       };
@@ -240,5 +268,6 @@ export default {
 }
 .new-folder-popup {
   padding: 0 75rpx;
+  margin: 20rpx 0;
 }
 </style>

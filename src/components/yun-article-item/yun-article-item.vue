@@ -3,7 +3,7 @@
     <u-card
       :title="article.title"
       :thumb="article.thumb"
-      :sub-title="article.mtime"
+      :sub-title="article.ctime"
       thumb-width="42"
       thumb-height="42"
       thumb-circle
@@ -19,10 +19,10 @@
           mode="aspectFill"
         ></image>
         <view class="body-text">
-          <text class="real-text" v-html="article.text"></text>
+          <text class="real-text" v-html="article.desc"></text>
         </view>
       </view>
-      <view slot="foot" class="card-foot">
+      <view slot="foot" class="article-foot">
         <!-- <u-icon name="chat" size="28" color="" label="阅读原文"></u-icon> -->
         <u-icon name="setting" size="28" margin-left="12" label="编辑"></u-icon>
       </view>
@@ -112,7 +112,7 @@ export default {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-.card-foot {
+.article-foot {
   display: flex;
   justify-content: space-between;
   align-items: center;

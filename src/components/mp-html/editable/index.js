@@ -15,9 +15,9 @@ function editable(vm) {
 
   vm._mask = []; // 蒙版被点击时进行的操作
 
-  vm._set = function (path, val) {
+  vm._setData = function (path, val) {
     var paths = path.split('.'),
-      target = vm;
+        target = vm;
 
     for (var i = 0; i < paths.length - 1; i++) {
       target = target[paths[i]];
@@ -38,7 +38,7 @@ function editable(vm) {
       if (item) {
         _this.editI += num;
 
-        vm._set(item.key, item.value);
+        vm._setData(item.key, item.value);
       }
     }, 200);
   };
@@ -102,7 +102,7 @@ function editable(vm) {
 
     _this.editI++; // 更新到视图
 
-    if (set) vm._set(path, newVal);
+    if (set) vm._setData(path, newVal);
   };
   /**
    * @description 获取菜单项
@@ -120,14 +120,15 @@ function editable(vm) {
         var _i = items.indexOf('换图');
 
         if (_i != -1) items.splice(_i, 1);
-        _i = items.indexOf('设置预览图');
+        _i = items.indexOf('超链接');
+        if (_i != -1) items.splice(_i, 1);
+        _i = items.indexOf('预览图');
         if (_i != -1) items.splice(_i, 1);
       }
 
       var i = items.indexOf('禁用预览');
       if (i != -1 && node.attrs.ignore) items[i] = '启用预览';
-    } else if (node.name == 'a') items = config.link.slice(0);
-    else if (node.name == 'video' || node.name == 'audio') {
+    } else if (node.name == 'a') items = config.link.slice(0);else if (node.name == 'video' || node.name == 'audio') {
       items = config.media.slice(0);
 
       var _i2 = items.indexOf('封面');
@@ -192,11 +193,7 @@ function editable(vm) {
 
 
   function insert(node) {
-    if (vm._edit) {
-      vm._edit.insert(node);
-    } else {
-      vm.nodes.push(node);
-    }
+    if (vm._edit) vm._edit.insert(node);else vm.nodes.push(node);
   }
   /**
    * @description 在光标处插入一张图片
@@ -208,14 +205,16 @@ function editable(vm) {
       insert({
         name: "p",
         attrs: {
+          class: 'mp-img-wrapper',
           style: "text-align:center;"
         },
         children: [{
           name: "img",
           attrs: {
-            src: src,
-          },
-        }],
+            class: 'mp-img',
+            src: src
+          }
+        }]
       });
     }).catch(function () {});
   };
@@ -225,20 +224,108 @@ function editable(vm) {
 
 
   vm.insertLink = function () {
-    vm.getSrc && vm.getSrc('link').then(function (url) {
+    vm.getSrc && vm.getSrc('link').then(function (link) {
       insert({
         name: "p",
         attrs: {
-          style: "text-align:center;"
+          class: 'mp-link-wrapper'
         },
         children: [{
           name: 'a',
           attrs: {
-            href: url
+            class: 'mp-link',
+            href: link.link
           },
           children: [{
+            attrs: {
+              class: 'mp-link-text'
+            },
             type: 'text',
-            text: url
+            text: link.name
+          }]
+        }]
+      });
+    }).catch(function () {});
+  };
+  /**
+   * @description 在光标处插入一个卡片
+   */
+
+
+  vm.insertCard = function () {
+    vm.getSrc && vm.getSrc('card').then(function (card) {
+      console.log();
+      insert({
+        name: "p",
+        attrs: {
+          class: 'mp-card-wrapper'
+        },
+        children: [{
+          name: 'div',
+          attrs: {
+            class: 'mp-card'
+          },
+          children: [{
+            name: 'div',
+            attrs: {
+              class: 'mp-card-header'
+            },
+            children: [{
+              name: 'div',
+              attrs: {
+                class: 'mp-card-header-title'
+              },
+              children: [{
+                attrs: {
+                  class: 'mp-card-header-title-text'
+                },
+                type: 'text',
+                text: card.title
+              }]
+            }, {
+              name: 'div',
+              attrs: {
+                class: 'mp-card-header-time'
+              },
+              children: [{
+                attrs: {
+                  class: 'mp-card-header-time-text'
+                },
+                type: 'text',
+                text: card.ctime
+              }]
+            }]
+          }, {
+            name: 'div',
+            attrs: {
+              class: 'mp-card-body'
+            },
+            children: [{
+              name: 'img',
+              attrs: {
+                class: 'mp-card-img',
+                src: card.img_url
+              }
+            }]
+          }, {
+            name: 'div',
+            attrs: {
+              class: 'mp-card-footer'
+            },
+            children: [{
+              name: 'a',
+              attrs: {
+                class: 'mp-card-footer-link',
+                href: card.link
+              },
+              children: [{
+                attrs: {
+                  class: 'mp-card-footer-link-text'
+                },
+                type: 'text',
+                text: '阅读'
+              }]
+            }]
           }]
         }]
       });
@@ -255,18 +342,20 @@ function editable(vm) {
       insert({
         name: 'div',
         attrs: {
-          style: 'text-align:center'
+          class: 'mp-video-wrapper'
         },
         children: [{
           name: 'iframe',
           attrs: {
+            width: '100%',
+            class: 'mp-video',
             scrolling: "no",
             border: "0",
             frameborder: "no",
             framespacing: "0",
             src: src
           },
-          children: [],
+          children: []
         }]
       });
     }).catch(function () {});
@@ -282,11 +371,13 @@ function editable(vm) {
       insert({
         name: 'div',
         attrs: {
-          style: 'text-align:center'
+          class: 'mp-audio-wrapper'
         },
         children: [{
           name: 'audio',
-          attrs: {},
+          attrs: {
+            class: 'mp-audio'
+          },
           children: [],
           src: src
         }]
@@ -301,10 +392,15 @@ function editable(vm) {
   vm.insertText = function () {
     insert({
       name: 'p',
-      attrs: {},
+      attrs: {
+        class: 'mp-text-wrapper'
+      },
       children: [{
         type: 'text',
-        text: '新段落'
+        text: '新段落',
+        attrs: {
+          class: 'mp-text'
+        }
       }]
     });
   };
@@ -314,6 +410,8 @@ function editable(vm) {
 
 
   vm.clear = function () {
+    vm._maskTap();
+
     vm._edit = void 0;
     vm.$set(vm, 'nodes', [{
       name: 'p',
@@ -337,90 +435,90 @@ function editable(vm) {
         var item = nodes[i];
         if (item.type == 'text') html += item.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>').replace(/\xa0/g, '&nbsp;'); // 编码实体
         else {
-          if (item.name == 'img') {
-            item.attrs.i = ''; // 还原被转换的 svg
+            if (item.name == 'img') {
+              item.attrs.i = ''; // 还原被转换的 svg
 
-            if ((item.attrs.src || '').includes('data:image/svg+xml;utf8,')) {
-              html += item.attrs.src.substr(24).replace(/%23/g, '#').replace('<svg', '<svg style="' + (item.attrs.style || '') + '"');
-              continue;
-            }
-          } // 还原 video 和 audio 的 source
-          else if (item.name == 'video' || item.name == 'audio') {
-            item = JSON.parse(JSON.stringify(item));
+              if ((item.attrs.src || '').includes('data:image/svg+xml;utf8,')) {
+                html += item.attrs.src.substr(24).replace(/%23/g, '#').replace('<svg', '<svg style="' + (item.attrs.style || '') + '"');
+                continue;
+              }
+            } // 还原 video 和 audio 的 source
+            else if (item.name == 'video' || item.name == 'audio') {
+                item = JSON.parse(JSON.stringify(item));
 
-            if (item.src.length > 1) {
-              item.children = [];
+                if (item.src.length > 1) {
+                  item.children = [];
 
-              for (var j = 0; j < item.src.length; j++) {
-                item.children.push({
-                  name: 'source',
-                  attrs: {
-                    src: item.src[j]
+                  for (var j = 0; j < item.src.length; j++) {
+                    item.children.push({
+                      name: 'source',
+                      attrs: {
+                        src: item.src[j]
+                      }
+                    });
                   }
-                });
+                } else item.attrs.src = item.src[0];
+              } // 还原滚动层
+              else if (item.name == 'div' && (item.attrs.style || '').includes('overflow:auto') && (item.children[0] || {}).name == 'table') item = item.children[0]; // 还原 table
+
+
+            if (item.name == 'table') {
+              item = JSON.parse(JSON.stringify(item));
+              table = item.attrs;
+
+              if ((item.attrs.style || '').includes('display:grid')) {
+                item.attrs.style = item.attrs.style.split('display:grid')[0];
+                var children = [{
+                  name: 'tr',
+                  attrs: {},
+                  children: []
+                }];
+
+                for (var _j = 0; _j < item.children.length; _j++) {
+                  item.children[_j].attrs.style = item.children[_j].attrs.style.replace(/grid-[^;]+;*/g, '');
+
+                  if (item.children[_j].r != children.length) {
+                    children.push({
+                      name: 'tr',
+                      attrs: {},
+                      children: [item.children[_j]]
+                    });
+                  } else children[children.length - 1].children.push(item.children[_j]);
+                }
+
+                item.children = children;
               }
-            } else item.attrs.src = item.src[0];
-          } // 还原滚动层
-          else if (item.name == 'div' && (item.attrs.style || '').includes('overflow:auto') && (item.children[0] || {}).name == 'table') item = item.children[0]; // 还原 table
+            }
 
+            html += '<' + item.name;
 
-          if (item.name == 'table') {
-            item = JSON.parse(JSON.stringify(item));
-            table = item.attrs;
+            for (var attr in item.attrs) {
+              var val = item.attrs[attr];
+              if (!val) continue; // bool 型省略值
 
-            if ((item.attrs.style || '').includes('display:grid')) {
-              item.attrs.style = item.attrs.style.split('display:grid')[0];
-              var children = [{
-                name: 'tr',
-                attrs: {},
-                children: []
-              }];
-
-              for (var _j = 0; _j < item.children.length; _j++) {
-                item.children[_j].attrs.style = item.children[_j].attrs.style.replace(/grid-[^;]+;*/g, '');
-
-                if (item.children[_j].r != children.length) {
-                  children.push({
-                    name: 'tr',
-                    attrs: {},
-                    children: [item.children[_j]]
+              if (val == 'T' || val === true) {
+                html += ' ' + attr;
+                continue;
+              } // 取消为了显示 table 添加的 style
+              else if (item.name[0] == 't' && attr == 'style' && table) {
+                  val = val.replace(/;*display:table[^;]*/, '');
+                  if (table.border) val = val.replace(/border[^;]+;*/g, function ($) {
+                    return $.includes('collapse') ? $ : '';
                   });
-                } else children[children.length - 1].children.push(item.children[_j]);
-              }
+                  if (table.cellpadding) val = val.replace(/padding[^;]+;*/g, '');
+                  if (!val) continue;
+                }
 
-              item.children = children;
-            }
-          }
-
-          html += '<' + item.name;
-
-          for (var attr in item.attrs) {
-            var val = item.attrs[attr];
-            if (!val) continue; // bool 型省略值
-
-            if (val == 'T' || val === true) {
-              html += ' ' + attr;
-              continue;
-            } // 取消为了显示 table 添加的 style
-            else if (item.name[0] == 't' && attr == 'style' && table) {
-              val = val.replace(/;*display:table[^;]*/, '');
-              if (table.border) val = val.replace(/border[^;]+;*/g, function ($) {
-                return $.includes('collapse') ? $ : '';
-              });
-              if (table.cellpadding) val = val.replace(/padding[^;]+;*/g, '');
-              if (!val) continue;
+              html += ' ' + attr + '="' + val.replace(/"/g, '&quot;') + '"';
             }
 
-            html += ' ' + attr + '="' + val.replace(/"/g, '&quot;') + '"';
-          }
+            html += '>';
 
-          html += '>';
-
-          if (item.children) {
-            traversal(item.children, table);
-            html += '</' + item.name + '>';
+            if (item.children) {
+              traversal(item.children, table);
+              html += '</' + item.name + '>';
+            }
           }
-        }
       }
     })(vm.nodes); // 其他插件处理
 
@@ -435,6 +533,8 @@ function editable(vm) {
 
 editable.prototype.onUpdate = function (content, config) {
   if (this.vm.editable) {
+    this.vm._maskTap();
+
     this.vm._edit = void 0;
     config.entities.amp = '&';
     if (!content) return '<p>开始</p>';

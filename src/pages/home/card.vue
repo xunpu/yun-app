@@ -13,7 +13,8 @@
 <script>
 import { getToken } from "@/store/storage";
 import storeCache from "@/store/cache";
-import { CARD_LIST, IMAGE_URL } from "@/api/api";
+import { CARD_LIST } from "@/api/api";
+import { renderCard } from "@/api/render";
 
 export default {
   data() {
@@ -42,27 +43,6 @@ export default {
         url: "/pages/card/edit",
       });
     },
-    renderData(imageList) {
-      var data = {};
-      var render_data = [];
-      imageList.forEach((v, i) => {
-        data = {
-          id: v[0],
-          creator: v[1],
-          uuid: v[2],
-          name: v[6],
-          title: v[7],
-          desc: v[8],
-          img: v[9],
-          link: v[10],
-          ctime: `${v[10].split(" ")[0]}`,
-          mtime: `${v[11].split(" ")[0]}`,
-          img_url: `${IMAGE_URL}/thumb/${v[9]}?id=${v[1]}`,
-        };
-        render_data.push(data);
-      });
-      return render_data;
-    },
     refreshCardList() {
       this.cardlist = [];
       storeCache.delete(`${CARD_LIST}`);
@@ -81,7 +61,7 @@ export default {
           })
           .then((res) => {
             if (res.data.length > 0) {
-              var data = this.renderData(res.data);
+              var data = renderCard(res.data);
               this.cardlist.push(data);
             }
             uni.stopPullDownRefresh();
@@ -117,6 +97,7 @@ uni-page-body {
 }
 .new-folder-popup {
   padding: 0 75rpx;
+  margin: 20rpx 0;
 }
 .wrap-inline {
   display: flex;

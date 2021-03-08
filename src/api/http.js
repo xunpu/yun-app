@@ -1,6 +1,10 @@
 // 将 api 的请求链接统一写在这个文件中
 // https://ext.dcloud.net.cn/plugin?id=392
 import Request from '@/utils/request';
+import {
+  API_URL
+} from '@/api/config';
+
 
 // #ifdef MP-WEIXIN
 import Vue from 'vue';
@@ -12,7 +16,7 @@ let app;
 
 http.setConfig(config => {
   Object.assign(config, {
-    baseUrl: '/api/api',
+    baseUrl: API_URL,
     header: {
       // 'Content-Type': 'application/vnd.api+json',
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -33,10 +37,10 @@ http.validateStatus = statusCode => {
 http.interceptor.request(conf => {
   const config = conf;
   if (config.custom.loading) {
-    uni.showLoading({
-      title: '加载中',
-      mask: true,
-    });
+    // uni.showLoading({
+    //   title: '加载中',
+    //   mask: true,
+    // });
   }
 
   // #ifdef MP-WEIXIN

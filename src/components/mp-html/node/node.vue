@@ -6,24 +6,24 @@
       <image v-if="n.name=='img'&&((opts[1]&&!ctrl[i])||ctrl[i]<0)" class="_img" :style="n.attrs.style" :src="ctrl[i]<0?opts[2]:opts[1]" mode="widthFix" />
       <!-- 显示图片 -->
       <!-- #ifdef H5 || APP-PLUS -->
-      <img v-if="n.name=='img'" :id="n.attrs.id" :class="'_img '+n.attrs.class" :style="(ctrl[i]==-1?'display:none;':'')+n.attrs.style" :src="n.attrs.src||(ctrl.load?n.attrs['data-src']:'')" :data-i="i" @load="imgLoad" @error="mediaError" @tap="imgTap" @longpress="imgLongTap"/>
+      <img v-if="n.name=='img'" :id="n.attrs.id" :class="'_img '+n.attrs.class" :style="(ctrl['e'+i]?'border:1px dashed black;padding:3px;':'')+(ctrl[i]==-1?'display:none;':'')+n.attrs.style" :src="n.attrs.src||(ctrl.load?n.attrs['data-src']:'')" :data-i="i" @load="imgLoad" @error="mediaError" @tap.stop="imgTap" @longpress="imgLongTap"/>
       <!-- #endif -->
       <!-- #ifndef H5 || APP-PLUS -->
-      <image v-if="n.name=='img'" :id="n.attrs.id||('n'+i)" :class="'_img '+n.attrs.class" :style="(ctrl[i]==-1?'display:none;':'')+'width:'+(ctrl[i]||1)+'px;height:'+(ctrl['ii'+i]||1)+'px;'+n.attrs.style" :src="n.attrs.src" :mode="n.h?'':'widthFix'" :lazy-load="opts[0]" :webp="n.webp" :show-menu-by-longpress="!opts[4]&&opts[3]&&!n.attrs.ignore" :image-menu-prevent="opts[4]||!opts[3]||n.attrs.ignore" :data-i="i" @load="imgLoad" @error="mediaError" @tap="imgTap" @longpress="imgLongTap" />
+      <image v-if="n.name=='img'" :id="n.attrs.id||('n'+i)" :class="'_img '+n.attrs.class" :style="(ctrl['e'+i]?'border:1px dashed black;padding:3px;':'')+(ctrl[i]==-1?'display:none;':'')+'width:'+(ctrl[i]||1)+'px;height:'+(ctrl['h'+i]||1)+'px;'+n.attrs.style" :src="n.attrs.src" :mode="n.h?'':'widthFix'" :lazy-load="opts[0]" :webp="n.webp" :show-menu-by-longpress="!opts[4]&&opts[3]&&!n.attrs.ignore" :image-menu-prevent="opts[4]||!opts[3]||n.attrs.ignore" :data-i="i" @load="imgLoad" @error="mediaError" @tap.stop="imgTap" @longpress="imgLongTap" />
       <!-- #endif -->
       <!-- 文本 -->
-      <text v-else-if="n.type=='text'&&!ctrl[i]" :data-i="i" @tap="editStart">{{n.text}}</text>
-      <text v-else-if="n.type=='text'&&ctrl[i]==1" :data-i="i" style="border:1px dashed black;min-width:50px;width:auto;padding:5px;display:block" @tap.stop="editStart">{{n.text}}</text>
-      <textarea v-else-if="n.type=='text'" style="border:1px dashed black;min-width:50px;width:auto;padding:5px" auto-height maxlength="-1" :focus="ctrl[i]==3" :value="n.text" :data-i="i" @input="editInput" @blur="editEnd" />
+      <text v-else-if="n.type=='text'&&!ctrl['e'+i]" :data-i="i" @tap="editStart">{{n.text}}</text>
+      <text v-else-if="n.type=='text'&&ctrl['e'+i]==1" :data-i="i" style="border:1px dashed black;min-width:50px;width:auto;padding:5px;display:block" @tap.stop="editStart">{{n.text}}</text>
+      <textarea v-else-if="n.type=='text'" style="border:1px dashed black;min-width:50px;width:auto;padding:5px" auto-height maxlength="-1" :focus="ctrl['e'+i]==3" :value="n.text" :data-i="i" @input="editInput" @blur="editEnd" />
       <text v-else-if="n.name=='br'">\n</text>
       <!-- 链接 -->
       <view v-else-if="n.name=='a'" :id="n.attrs.id" :class="(n.attrs.href?'_a ':'')+n.attrs.class" hover-class="_hover" :style="'display:inline;'+n.attrs.style" :data-i="i" @tap.stop="linkTap">
-        <node name="span" :childs="n.children" :opts="[opts[0],opts[1],opts[2],opts[3],opts[4],opts[5]+'.'+i+'.children']" />
+        <node name="span" :childs="n.children" :opts="[opts[0],opts[1],opts[2],opts[3],opts[4],opts[5]+'.'+i+'.children']" style="display:inherit" />
       </view>
       <!-- 视频 -->
 		  <view v-else-if="opts[4]&&n.name=='video'" :class="'_video '+n.attrs.class" :style="(n.attrs.poster?'background-image:url('+n.attrs.poster+');background-size:100% 100%;':'')+n.attrs.style" :data-i="i" @tap="mediaTap" />
       <!-- #ifdef APP-PLUS -->
-      <view v-else-if="n.html" :id="n.attrs.id" :class="n.attrs.class" :style="n.attrs.style" v-html="n.html" />
+      <view v-else-if="n.html" :id="n.attrs.id" :class="'_video '+n.attrs.class" :style="n.attrs.style" v-html="n.html" />
       <!-- #endif -->
       <!-- #ifndef APP-PLUS -->
       <video v-else-if="n.name=='video'" :id="n.attrs.id" :class="n.attrs.class" :style="n.attrs.style" :autoplay="n.attrs.autoplay" :controls="n.attrs.controls" :loop="n.attrs.loop" :muted="n.attrs.muted" :poster="n.attrs.poster" :src="n.src[ctrl[i]||0]" :data-i="i" @play="play" @error="mediaError" />
@@ -177,11 +177,11 @@ export default {
   methods:{editStart(e) {
       if (this.opts[4]) {
         var i = e.target.dataset.i
-        if (!this.ctrl[i]) {
+        if (!this.ctrl['e' + i]) {
           // 显示虚线框
-          this.$set(this.ctrl, i, 1)
+          this.$set(this.ctrl, 'e' + i, 1)
           setTimeout(() => {
-            this.root._mask.push(() => this.$set(this.ctrl, i, 0))
+            this.root._mask.push(() => this.$set(this.ctrl, 'e' + i, 0))
           }, 50)
           this.root._edit = this
           this.i = i
@@ -190,10 +190,10 @@ export default {
           this.root._mask.pop()
           this.root._maskTap()
           // 将 text 转为 
-          this.$set(this.ctrl, i, 2)
+          this.$set(this.ctrl, 'e' + i, 2)
           // 延时对焦，避免高度错误
           setTimeout(() => {
-            this.$set(this.ctrl, i, 3)
+            this.$set(this.ctrl, 'e' + i, 3)
           }, 50)
         }
       }
@@ -210,9 +210,9 @@ export default {
       this.cursor = e.detail.cursor
     },editEnd(e) {
       var i = e.target.dataset.i
-      this.$set(this.ctrl, i, 0)
+      this.$set(this.ctrl, 'e' + i, 0)
       // 更新到视图
-      this.root._set(`${this.opts[5]}.${i}.text`, e.detail.value)
+      this.root._setData(`${this.opts[5]}.${i}.text`, e.detail.value)
     },insert(node) {
       setTimeout(() => {
         var childs = this.childs.slice(0)
@@ -246,7 +246,7 @@ export default {
         setTimeout(() => {
           this.root._lock = false
         }, 50)
-        if (this.ctrl[this.i] == 3)
+        if (this.ctrl['e' + this.i] == 3)
           return
         this.root._maskTap()
         this.root._edit = this
@@ -264,9 +264,9 @@ export default {
         // 显示实线框
         this.$set(this.ctrl, 'root', 1)
         this.root._mask.push(() => this.$set(this.ctrl, 'root', 0))
-        if (this.childs.length == 1 && this.childs[0].type == 'text' && !this.ctrl[0]) {
-          this.$set(this.ctrl, 0, 1)
-          this.root._mask.push(() => this.$set(this.ctrl, 0, 0))
+        if (this.childs.length == 1 && this.childs[0].type == 'text' && !this.ctrl.e0) {
+          this.$set(this.ctrl, 'e0', 1)
+          this.root._mask.push(() => this.$set(this.ctrl, 'e0', 0))
           this.i = 0
           this.cursor = this.childs[0].text.length
         }
@@ -311,8 +311,11 @@ export default {
                 name = 'font-style'
                 value = 'italic'
               } else if (item == '粗体') {
-                name = 'font-weight',
-                  value = 'bold'
+                name = 'font-weight'
+                value = 'bold'
+              } else if (item == '下划线') {
+                name = 'text-decoration'
+                value = 'underline'
               } else if (item == '居中') {
                 name = 'text-align'
                 value = 'center'
@@ -352,7 +355,7 @@ export default {
               this.remove(i)
             // 切换循环播放
             else {
-              this.root._set(`${this.opts[5]}.${i}.attrs.loop`, !node.attrs.loop)
+              this.root._setData(`${this.opts[5]}.${i}.attrs.loop`, !node.attrs.loop)
               uni.showToast({
                 title: '成功'
               })
@@ -373,7 +376,7 @@ export default {
       // 没有则新增
       else
         style += ';' + name + ':' + value
-      this.root._set(`${this.opts[5]}.${i}.attrs.style`, style)
+      this.root._setData(`${this.opts[5]}.${i}.attrs.style`, style)
     },
     // #ifdef MP-WEIXIN
     toJSON() { },
@@ -412,15 +415,19 @@ export default {
      */
     imgTap (e) {
       if (!this.opts[4]) {
-      var attrs = this.childs[e.currentTarget.dataset.i].attrs
-      if (attrs.ignore)
+      var node = this.childs[e.currentTarget.dataset.i]
+      if (node.a)
+        return this.linkTap(node.a)
+      if (node.attrs.ignore)
         return
-      attrs.src = attrs['data-src'] || attrs.src
-      this.root.$emit('imgtap', attrs)
+      // #ifdef H5 || APP-PLUS
+      node.attrs.src = node.attrs.src || node.attrs['data-src']
+      // #endif
+      this.root.$emit('imgtap', node.attrs)
       // 自动预览图片
       if (this.root.previewImg)
         uni.previewImage({
-          current: parseInt(attrs.i),
+          current: parseInt(node.attrs.i),
           urls: this.root.imgList
         })
     }
@@ -431,8 +438,8 @@ export default {
         this.root._edit = this
         this.i = i
         this.root._maskTap()
-        this.$set(this.ctrl, 'i' + i, 1)
-        this.root._mask.push(() => this.$set(this.ctrl, 'i' + i, 0))
+        this.$set(this.ctrl, 'e' + i, 1)
+        this.root._mask.push(() => this.$set(this.ctrl, 'e' + i, 0))
         this.root._tooltip({
           top: getTop(e),
           items,
@@ -445,7 +452,7 @@ export default {
             // 更改宽度
             else if (items[tapIndex] == '宽度') {
               var style = node.attrs.style || '',
-              value = style.match(/;width:([0-9]+)%/)
+              value = style.match(/max-width:([0-9]+)%/)
               if (value)
                 value = parseInt(value[1])
               else
@@ -459,16 +466,32 @@ export default {
                   // 变化超过 5% 更新时视图
                   if (Math.abs(val - value) > 5) {
                     this.changeStyle('max-width', i, val + '%', value + '%')
-                    value = e.detail.value
+                    value = val
                   }
                 },
                 change: val => {
-                  if (val != value)
-                  this.changeStyle('max-width', i, val + '%', value + '%')
+                  if (val != value) {
+                    this.changeStyle('max-width', i, val + '%', value + '%')
+                    value = val
+                  }
                   this.root._editVal(this.opts[5] + '.' + i + '.attrs.style', style, this.childs[i].attrs.style)
                 }
               })
             }
+            // 将图片设置为链接
+            else if (items[tapIndex] == '超链接')
+              this.root.getSrc('link').then(url => {
+                this.root._editVal(this.opts[5] + '.' + i, node, {
+                  name: 'a',
+                  attrs: {
+                    href: url
+                  },
+                  children: [node]
+                }, true)
+                wx.showToast({
+                  title: '成功'
+                })
+              }).catch(() => { })
             // 设置预览图链接
             else if (items[tapIndex] == '预览图')
               this.root.getSrc('img', node.attrs['original-src']).then(url => {
@@ -481,7 +504,7 @@ export default {
               this.remove(i)
             // 禁用 / 启用预览
             else {
-              this.root._set(this.opts[5] + '.' + i + '.attrs.ignore', !node.attrs.ignore)
+              this.root._setData(this.opts[5] + '.' + i + '.attrs.ignore', !node.attrs.ignore)
               uni.showToast({
                 title: '成功'
               })
@@ -497,9 +520,7 @@ export default {
     /**
      * @description 图片长按
      */
-    imgLongTap() {
-      if (this.opts[4])
-        return
+    imgLongTap(e) {
       // #ifdef APP-PLUS
       var attrs = this.childs[e.currentTarget.dataset.i].attrs
       if (!attrs.ignore)
@@ -534,7 +555,7 @@ export default {
         this.$nextTick(() => {
           var id = this.childs[i].attrs.id || ('n' + i)
           uni.createSelectorQuery().in(this).select('#' + id).boundingClientRect().exec(res => {
-            this.$set(this.ctrl, 'ii'+i, res[0].height)
+            this.$set(this.ctrl, 'h'+i, res[0].height)
           })
         })
       // #endif
@@ -546,8 +567,8 @@ export default {
         if (this.opts[4]) {
           var path = this.opts[5] + '.' + i + '.attrs.'
           if (e.detail.width < 150)
-            this.root._set(path + 'ignore', 'T')
-          this.root._set(path + 'width', e.detail.width.toString())
+            this.root._setData(path + 'ignore', 'T')
+          this.root._setData(path + 'width', e.detail.width.toString())
         }
       }
       else
@@ -563,7 +584,7 @@ export default {
      */
     linkTap (e) {
       if (!this.opts[4]) {
-      var attrs = this.childs[e.currentTarget.dataset.i].attrs,
+      var attrs = e.currentTarget ? this.childs[e.currentTarget.dataset.i].attrs : e,
         href = attrs.href
       this.root.$emit('linktap', attrs)
       if (href) {
@@ -652,7 +673,30 @@ export default {
   }
 }
 </script>
-<style>
+<style>/* #ifndef H5 || MP-ALIPAY || APP-PLUS */
+  ._address,
+  ._article,
+  ._aside,
+  ._body,
+  ._caption,
+  ._center,
+  ._cite,
+  ._footer,
+  ._header,
+  ._html,
+  ._nav,
+  ._pre,
+  ._section {
+    display: block;
+  }
+  
+  /* #endif */
+  ._video {
+    width: 300px;
+    height: 225px;
+    display: inline-block;
+    background-color: black;
+	}
 /* a 标签默认效果 */
 ._a {
   padding: 1.5px 0 1.5px 0;
@@ -812,27 +856,11 @@ export default {
 ._sup {
   display: inline;
 }
-/* #ifndef H5 || MP-ALIPAY || APP-PLUS */
-  ._address,
-  ._article,
-  ._aside,
-  ._body,
-  ._caption,
-  ._center,
-  ._cite,
-  ._footer,
-  ._header,
-  ._html,
-  ._nav,
-  ._pre,
-  ._section {
-    display: block;
-  }
-  
-  /* #endif */
-  ._video {
-    width: 300px;
-    height: 225px;
-    display: inline-block;
-    background-color: black;
-	}</style>
+
+/* #ifdef APP-PLUS */
+._video {
+  width: 300px;
+  height: 225px;
+}
+/* #endif */
+</style>

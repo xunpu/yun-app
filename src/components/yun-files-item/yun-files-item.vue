@@ -22,7 +22,10 @@
 </template>
 
 <script>
-import { viewCard } from "@/api/api";
+import { DOWNLOAD_URL, viewCard, viewArticle } from "@/api/api";
+import { renderArticle, renderCard } from "@/api/render";
+import { getToken } from "@/store/storage";
+import FileSaver from "file-saver";
 const TYPE_IMG = { 1: "folder", 2: "other", 3: "card", 4: "article" };
 export default {
   props: {
@@ -70,14 +73,49 @@ export default {
         this.checkState ? (this.checkState = false) : (this.checkState = true);
       } else if (this.file.type == 1) {
         this.$emit("take-file", this.file);
+      } else if (this.file.type == 2) {
+        uni.showModal({
+          title: "下载文件",
+          content: `${this.file.name}`,
+          success: (res) => {
+            if (res.confirm) {
+              FileSaver.saveAs(
+                `${DOWNLOAD_URL}/${this.file.uuid}?id=${this.file.id}`,
+                this.file.name
+              );
+            }
+          },
+        });
       } else if (this.file.type == 3) {
-        // let that = this;
-        // uni.navigateTo({
-        //   url: "/pages/card/edit",
-        //   success: function (res) {
-        //     res.eventChannel.emit("acceptCardData", { card: that.file }, true);
-        //   },
-        // });
+        getToken().then((token) => {
+          viewCard({ uuid: this.file.uuid, token: token }).then((res) => {
+            if(res.code != 0) return;
+            var card = renderCard(res.data);
+            uni.navigateTo({
+              url: "/pages/card/edit",
+              success: function (res) {
+                res.eventChannel.emit("acceptCardData", { card: card[0] }, true);
+              },
+            });
+          });
+        });
+      } else if (this.file.type == 4) {
+        getToken().then((token) => {
+          viewArticle({ uuid: this.file.uuid, token: token }).then((res) => {
+            if(res.code != 0) return;
+            var article = renderArticle(res.data);
+            uni.navigateTo({
+              url: "/pages/article/edit",
+              success: function (res) {
+                res.eventChannel.emit(
+                  "acceptArticleData",
+                  { article: article[0] },
+                  true
+                );
+              },
+            });
+          });
+        });
       }
     },
   },

@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import yunArticleItem from '../yun-article-item/yun-article-item.vue';
+import yunArticleItem from "../yun-article-item/yun-article-item.vue";
 export default {
   components: { yunArticleItem },
   props: {
@@ -51,7 +51,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-uni-page-body {
+uni-page-body/deep/ .tui-list-content {
   background-color: #eee;
+  padding-bottom: 140rpx;
 }
 </style>

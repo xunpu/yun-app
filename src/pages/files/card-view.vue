@@ -1,78 +1,72 @@
 <template>
   <view class="page">
-    <yun-article-content :articlelist="articlelist"></yun-article-content>
-    <tui-fab
-      :right="50"
-      :bottom="150"
-      @click="navToEditor"
-      bgColor="#81b71a"
-    ></tui-fab>
+    <yun-card-content :cardlist="cardlist"></yun-card-content>
   </view>
 </template>
   
 <script>
 import { getToken } from "@/store/storage";
 import storeCache from "@/store/cache";
-import { ARTICLE_LIST } from "@/api/api";
-import { renderArticle } from "@/api/render";
+import { CARD_LIST } from "@/api/api";
+import { renderCard } from "@/api/render";
 
 export default {
   data() {
     return {
       path: "",
-      articlelist: [],
+      cardlist: [],
       newFolderPanelShow: false,
       newFolderForm: {},
     };
   },
   onReady() {
     // uni.$on("refreshFileList", (res) => {
-    //   this.refreshArticleList();
+    //   this.refreshCardList();
     // });
-    // this.refreshArticleList();
-  },
-  onShow() {
-    this.refreshArticleList();
+    // this.refreshCardList();
   },
   onHide() {
-    this.articlelist = [];
+    this.cardlist = [];
+  },
+  onShow() {
+    this.refreshCardList();
   },
   methods: {
     navToEditor() {
       uni.navigateTo({
-        url: "/pages/article/edit",
+        url: "/pages/card/edit",
       });
     },
-    refreshArticleList() {
-      this.articlelist = [];
-      storeCache.delete(`${ARTICLE_LIST}`);
+    refreshCardList() {
+      this.cardlist = [];
+      storeCache.delete(`${CARD_LIST}`);
       let that = this;
       getToken().then((token) => {
-        storeCache.on(`${ARTICLE_LIST}`, {}, { token: token }).then((res) => {
-          that.getArticles();
+        storeCache.on(`${CARD_LIST}`, {}, { token: token }).then((res) => {
+          that.getCards();
         });
       });
     },
-    getArticles() {
+    getCards() {
       getToken().then((token) => {
         storeCache
-          .next(`${ARTICLE_LIST}`, {
+          .next(`${CARD_LIST}`, {
             token: token,
           })
           .then((res) => {
             if (res.data.length > 0) {
-              var data = renderArticle(res.data);
-              this.articlelist.push(data);
+              var data = renderCard(res.data, { is_view: true });
+              this.cardlist.push(data);
             }
             uni.stopPullDownRefresh();
           });
       });
     },
     onPullDownRefresh() {
-      this.refreshArticleList();
+      this.refreshCardList();
     },
     onReachBottom: function () {
-      this.getArticles();
+      this.getCards();
     },
   },
 };
@@ -97,7 +91,6 @@ uni-page-body {
 }
 .new-folder-popup {
   padding: 0 75rpx;
-  margin: 20rpx 0;
 }
 .wrap-inline {
   display: flex;

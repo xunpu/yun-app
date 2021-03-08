@@ -142,6 +142,7 @@
 import { getToken } from "@/store/storage";
 import storeCache from "@/store/cache";
 import { API_PATH, FILE_LIST, mkdir, rename, remove } from "@/api/api";
+import { renderFile } from "@/api/render";
 export default {
   data() {
     return {
@@ -259,7 +260,7 @@ export default {
             // console.log(JSON.stringify(res.tempFilePaths));
             getToken().then((token) => {
               uni.uploadFile({
-                url: `${API_PATH}/v1/fs/upload`, //仅为示例，非真实的接口地址
+                url: `${API_PATH}/v1/fs/upload`,
                 filePath: res.tempFilePaths[0],
                 formData: {
                   path: that.path,
@@ -268,7 +269,7 @@ export default {
                   token: token,
                 },
                 success: (uploadFileRes) => {
-                  console.log(uploadFileRes.data);
+                  that.refreshFileList();
                 },
               });
             });
@@ -334,32 +335,12 @@ export default {
           .next(`${FILE_LIST}/${this.pid}`, { token: token })
           .then((res) => {
             if (res.data.length > 0) {
-              var data = this.renderData(res.data);
+              var data = renderFile(res.data);
               this.filelist.push(data);
             }
             uni.stopPullDownRefresh();
           });
       });
-    },
-    renderData(filelist) {
-      var data = {};
-      var render_data = [];
-      filelist.forEach((v, i) => {
-        data = {
-          id: v[0],
-          name: v[2],
-          type: v[3],
-          ext: v[4],
-          size: v[5],
-          pid: v[6],
-          path: v[7],
-          uuid: v[8],
-          ctime: `${v[9].split(" ")[0]} ${v[9].split(" ")[1]}`,
-          mtime: `${v[10].split(" ")[0]} ${v[10].split(" ")[1]}`,
-        };
-        render_data.push(data);
-      });
-      return render_data;
     },
   },
   onShow() {

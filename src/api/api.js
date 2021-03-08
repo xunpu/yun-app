@@ -1,9 +1,11 @@
 import {
     http
 } from "@/api/http";
-import mock from "@/mock/mock";
+import {
+    API_URL
+} from '@/api/config';
 
-const API_PATH = '/api/api';
+const API_PATH = API_URL;
 // const FILE_LIST = '/files';
 const FILE_LIST = '/v1/fs/ls';
 const CARD_LIST = '/v1/card/ls';
@@ -12,7 +14,8 @@ const IMAGE_LIST = '/v1/fs/ls';
 const IMAGE_VIEW = '/v1/fs/view';
 const AVATAR_PATH = '/account/pre/avatar';
 const UPLOAD_FILE_PATH = `${API_PATH}/v1/fs/upload`;
-const IMAGE_URL = `${API_PATH}${IMAGE_VIEW}`
+const IMAGE_URL = `${API_PATH}${IMAGE_VIEW}`;
+const DOWNLOAD_URL = `${API_PATH}${IMAGE_VIEW}`;
 
 export {
     API_PATH,
@@ -23,7 +26,8 @@ export {
     IMAGE_VIEW,
     AVATAR_PATH,
     UPLOAD_FILE_PATH,
-    IMAGE_URL
+    IMAGE_URL,
+    DOWNLOAD_URL
 }
 
 export const getFiles = function () {

@@ -31,7 +31,8 @@
 </template>
   
 <script>
-import { FILE_LIST, IMAGE_URL } from "@/api/api";
+import { FILE_LIST } from "@/api/api";
+import { renderImage } from "@/api/render";
 import { getToken } from "@/store/storage";
 import storeCache from "@/store/cache";
 export default {
@@ -48,33 +49,12 @@ export default {
     this.refreshImageList();
   },
   methods: {
-    renderData(imageList) {
-      var data = {};
-      var render_data = [];
-      imageList.forEach((v, i) => {
-        data = {
-          id: v[0],
-          name: v[2],
-          type: v[3],
-          ext: v[4],
-          size: v[5],
-          pid: v[6],
-          path: v[7],
-          uuid: v[8],
-          ctime: `${v[9].split(" ")[0]} ${v[9].split(" ")[1]}`,
-          mtime: `${v[10].split(" ")[0]} ${v[10].split(" ")[1]}`,
-          url: `${IMAGE_URL}/thumb/${v[8]}?id=${v[11]}`,
-        };
-        render_data.push(data);
-      });
-      return render_data;
-    },
     choose(img) {
       let that = this;
       uni.navigateBack({
         delta: 1,
       });
-      if (this.from == 'article') {
+      if (this.from == "article") {
         uni.$emit("acceptArticleImageChooseData", { img: img });
       } else {
         uni.$emit("acceptImageData", { img: img });
@@ -106,7 +86,7 @@ export default {
           })
           .then((res) => {
             if (res.data.length > 0) {
-              var data = this.renderData(res.data);
+              var data = renderImage(res.data);
               this.imageList.push(data);
             }
             uni.stopPullDownRefresh();

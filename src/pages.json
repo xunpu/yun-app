@@ -3,7 +3,6 @@
 		"autoscan": true,
 		"^tui-(.*)": "thorui-uni/lib/thorui/tui-$1/tui-$1.vue",
 		"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
-		// "mp-html": "mp-html/dist/uni-app/components/mp-html/mp-html"
 	},
 	"pages": [{
 			"path": "pages/home/index",
@@ -46,6 +45,13 @@
 			"path": "pages/files/image-view",
 			"style": {
 				"navigationBarTitleText": "浏览图片",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/files/card-view",
+			"style": {
+				"navigationBarTitleText": "浏览卡片",
 				"enablePullDownRefresh": true
 			}
 		},

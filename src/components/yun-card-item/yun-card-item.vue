@@ -2,14 +2,14 @@
   <view class="wrap">
     <u-card
       :title="card.title"
-      :sub-title="card.mtime"
+      :sub-title="card.ctime"
       thumb-width="42"
       thumb-height="42"
       thumb-circle
       margin="30rpx 40rpx 0 40rpx"
       @head-click="open"
       @body-click="open"
-      @foot-click="edit"
+      @foot-click="option"
     >
       <view slot="body" class="body">
         <image class="body-image" :src="card.img_url" mode="aspectFill"></image>
@@ -18,8 +18,12 @@
         </view>
       </view>
       <view slot="foot" class="card-foot">
-        <!-- <u-icon name="chat" size="28" color="" label="阅读原文"></u-icon> -->
-        <u-icon name="setting" size="28" margin-left="12" label="编辑"></u-icon>
+        <u-icon
+          name="setting"
+          size="28"
+          margin-left="12"
+          :label="card._opt.is_view ? '选择' : '编辑'"
+        ></u-icon>
       </view>
     </u-card>
   </view>
@@ -40,14 +44,21 @@ export default {
     open() {
       this.$emit("detail", { link: this.card.link });
     },
-    edit() {
+    option() {
       let that = this;
-      uni.navigateTo({
-        url: "/pages/card/edit",
-        success: function (res) {
-          res.eventChannel.emit("acceptCardData", { card: that.card}, true);
-        },
-      });
+      if (that.card._opt.is_view) {
+        uni.navigateBack({
+          delta: 1,
+        });
+        uni.$emit("acceptArticleCardChooseData", { card: that.card });
+      } else {
+        uni.navigateTo({
+          url: "/pages/card/edit",
+          success: function (res) {
+            res.eventChannel.emit("acceptCardData", { card: that.card }, true);
+          },
+        });
+      }
     },
   },
 };

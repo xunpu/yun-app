@@ -75,7 +75,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// .warp {
-//   touch-action: none;
-// }
+uni-page-body/deep/ .tui-list-content {
+  background-color: #FFF;
+}
 </style>

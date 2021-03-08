@@ -10,6 +10,7 @@ module.exports = {
         "disableHostCheck": true,
         "proxy": {
             "/api": {
+                // "target": "http://yun.pyforce.com.cn",
                 "target": "http://yun.test.com:8080",
                 "changeOrigin": true,
                 "secure": false,

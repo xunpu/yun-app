@@ -50,7 +50,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-uni-page-body {
+uni-page-body/deep/ .tui-list-content {
   background-color: #eee;
+  padding-bottom: 140rpx;
 }
 </style>
